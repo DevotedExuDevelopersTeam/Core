@@ -49,16 +49,15 @@ def generate_id():
 
 async def draw_leaderboard(bot: Bot, page: int) -> bytes:
     return await asyncio.get_event_loop().run_in_executor(
-        None, _draw_leaderboard, bot, page
+        None, _draw_leaderboard, bot, page, await bot.db.get_top_data(page)
     )
 
 
-def _draw_leaderboard(bot: Bot, page: int) -> bytes:
+def _draw_leaderboard(bot: Bot, page: int, top_data) -> bytes:
     img = Image.open("res/template.png")
     draw = ImageDraw.Draw(img)
     font = get_font(45)
     page_font = get_font(60)
-    top_data = await bot.db.get_top_data(page)
     for pos, entry in enumerate(top_data):
         y_pos = FIRST_ROW_Y + 90 * pos
         if y_pos > 1070:

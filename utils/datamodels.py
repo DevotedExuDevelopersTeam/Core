@@ -90,7 +90,7 @@ class Database:
 
     async def get_member_afk(self, id: int) -> tuple[str, datetime] | tuple[None, None]:
         r = await self.execute(
-            "SELECT afk FROM afks WHERE id = $1", id, fetch_mode=FetchMode.ROW
+            "SELECT afk, set_at FROM afks WHERE id = $1", id, fetch_mode=FetchMode.ROW
         )
         if r is None:
             return None, None

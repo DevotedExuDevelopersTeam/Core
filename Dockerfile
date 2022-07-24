@@ -1,6 +1,4 @@
 FROM python:3.10-bullseye
-RUN apt-get update -y
-RUN apt-get install ffmpeg -y
 
 RUN pip install --no-cache-dir -U poetry
 

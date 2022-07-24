@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 
 import disnake
-from disnake.ext import tasks
+from disnake.ext import commands, tasks
 
 from utils.bot import Bot
 from utils.cog import Cog
 from utils.enums import FetchMode
+from utils.errors import UNKNOWN, get_error_msg
 
 
 class SystemLoops(Cog):
@@ -77,3 +78,14 @@ class SystemLoops(Cog):
             "DELETE FROM warns WHERE issued_at < $1",
             datetime.now() - timedelta(days=30),
         )
+
+
+class SystemListeners(Cog):
+    @Cog.listener()
+    async def on_slash_command_error(
+        self, inter: disnake.ApplicationCommandInteraction, error: commands.CommandError
+    ):
+        text = get_error_msg(error)
+        if text is UNKNOWN:
+            raise error
+        await inter.send(text, ephemeral=True)

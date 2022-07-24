@@ -1,4 +1,10 @@
+import inspect
+import sys
+
+import disnake
 from disnake.ext import commands
+
+UNKNOWN = object()
 
 
 class CustomError(commands.CommandError):
@@ -35,3 +41,39 @@ class RuleNotFound(CustomError):
 class YoutubeFetchFailure(CustomError):
     def __init__(self, youtuber_id: str):
         super().__init__(f"Failed to fetch latest video for youtuber {youtuber_id}")
+
+
+known_exceptions = [
+    inspect.getmembers(
+        sys.modules[__name__],
+        lambda x: inspect.isclass(x) and issubclass(x, CustomError),
+    )
+]
+known_exceptions.extend(
+    [
+        commands.MissingRequiredArgument,
+        commands.ArgumentParsingError,
+        commands.BadArgument,
+        commands.CheckFailure,
+        commands.CommandNotFound,
+        commands.DisabledCommand,
+        commands.CommandOnCooldown,
+        commands.NotOwner,
+        commands.MemberNotFound,
+        commands.UserNotFound,
+        commands.ChannelNotFound,
+        commands.RoleNotFound,
+        commands.MissingPermissions,
+        commands.BotMissingPermissions,
+        commands.MissingRole,
+        commands.MissingAnyRole,
+        disnake.Forbidden,
+    ]
+)
+
+
+def get_error_msg(error: commands.CommandError) -> str | UNKNOWN:
+    if type(error) not in known_exceptions:
+        return UNKNOWN
+    else:
+        return str(error)

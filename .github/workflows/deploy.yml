@@ -15,6 +15,10 @@ jobs:
 
       - name: Build and Run
         run: docker-compose up -d --build
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
 
       - name: Display Logs
         run: python3 -m exendlr core "bot is ready!"

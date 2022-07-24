@@ -73,7 +73,7 @@ known_exceptions.extend(
 )
 
 
-def get_error_msg(error: commands.CommandError) -> str | Type[UNKNOWN]:
+def get_error_msg(error: commands.CommandError) -> object | str:
     if type(error) not in known_exceptions:
         return UNKNOWN
     else:

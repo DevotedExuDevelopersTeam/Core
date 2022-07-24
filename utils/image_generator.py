@@ -105,7 +105,7 @@ async def draw_rank_card(
     position: int,
     next_role: Role,
     current_score: int,
-    score_to_next_role: int = None
+    score_to_next_role: int = None,
 ) -> BytesIO:
     return await asyncio.get_running_loop().run_in_executor(
         None,

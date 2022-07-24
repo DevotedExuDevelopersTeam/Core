@@ -99,7 +99,7 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
             f"Are you sure you want to DM {user.mention} this text?",
             embed=disnake.Embed(description=text),
             ephemeral=True,
-            view=view
+            view=view,
         )
         r, inter = await view.get_result()
         if r:

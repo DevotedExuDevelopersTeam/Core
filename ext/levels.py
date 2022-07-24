@@ -95,7 +95,8 @@ class Levels(Cog):
                     next_role,
                     current_score,
                     next_score,
-                ), filename="rank.png"
+                ),
+                filename="rank.png",
             )
         )
         f.close()
@@ -108,7 +109,11 @@ class Levels(Cog):
         self, inter: disnake.ApplicationCommandInteraction, page: int = 1
     ):
         await inter.response.defer()
-        await inter.send(file=disnake.File(f := await draw_leaderboard(self.bot, page), filename="leaderboard.png"))
+        await inter.send(
+            file=disnake.File(
+                f := await draw_leaderboard(self.bot, page), filename="leaderboard.png"
+            )
+        )
         f.close()
 
     @commands.slash_command(name="levels", description="Shows all leveled roles")

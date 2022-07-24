@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 
 import disnake
@@ -60,12 +61,17 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
 
     @commands.slash_command(name="setbg", description="Sets your rank card background")
     async def setbg(
-        self, inter: disnake.ApplicationCommandInteraction, bg: disnake.Attachment
+        self, inter: disnake.ApplicationCommandInteraction, bg: disnake.Attachment = None
     ):
+        path = f"backgrounds/{inter.author.id}.png"
+        if bg is None:
+            os.remove(path)
+            await inter.send("Successfully reset your background")
         await inter.response.defer()
         # noinspection PyTypeChecker
-        await bg.save(path := f"backgrounds/{inter.author.id}.png")
+        await bg.save(path)
         await resize_bg(path)
+        await inter.send("Successfully set your background")
 
     @commands.slash_command(name="afk", description="Sets an AFK")
     async def afk(self, inter: disnake.ApplicationCommandInteraction, text: str):

@@ -295,9 +295,11 @@ class ChannelsModeration(Cog):
             await inter.send("This channel is already locked", ephemeral=True)
             return
 
+        overwrite = channel.overwrites_for(inter.guild.default_role)
+        overwrite.send_messages = False
         await channel.set_permissions(
             inter.guild.default_role,
-            overwrite=disnake.PermissionOverwrite(send_messages=False),
+            overwrite=overwrite,
             reason=f"Mod: {inter.user}",
         )
         if time is not None:
@@ -327,9 +329,11 @@ class ChannelsModeration(Cog):
             await inter.send("This channel is not locked", ephemeral=True)
             return
 
+        overwrite = channel.overwrites_for(inter.guild.default_role)
+        overwrite.send_messages = None
         await channel.set_permissions(
             inter.guild.default_role,
-            overwrite=disnake.PermissionOverwrite(send_messages=None),
+            overwrite=overwrite,
             reason=f"Mod: {inter.user}",
         )
         await self.bot.db.remove_locked_channel(channel.id)
@@ -415,9 +419,11 @@ class ChannelsModeration(Cog):
             if c.permissions_for(inter.guild.default_role).send_messages is not False
         ]
         for c in self.locked_channels:
+            overwrite = c.overwrites_for(inter.guild.default_role)
+            overwrite.send_messages = False
             await c.set_permissions(
                 inter.guild.default_role,
-                overwrite=disnake.PermissionOverwrite(send_messages=False),
+                overwrite=overwrite,
                 reason=f"Server lock done by {inter.user}",
             )
         await inter.send(
@@ -429,9 +435,11 @@ class ChannelsModeration(Cog):
     async def unlockserver(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         for c in self.locked_channels:
+            overwrite = c.overwrites_for(inter.guild.default_role)
+            overwrite.send_messages = None
             await c.set_permissions(
                 inter.guild.default_role,
-                overwrite=disnake.PermissionOverwrite(send_messages=None),
+                overwrite=overwrite,
                 reason=f"Server unlock done by {inter.user}",
             )
         await inter.send("Unlocked the server")

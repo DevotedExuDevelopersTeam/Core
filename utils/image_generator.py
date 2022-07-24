@@ -1,6 +1,7 @@
 import asyncio
 import os
 from datetime import datetime
+from io import BytesIO
 from random import randint
 from urllib.request import build_opener, install_opener, urlretrieve
 
@@ -47,13 +48,13 @@ def generate_id():
     return f"{int(datetime.now().timestamp())}{str(randint(1000, 9999))}"
 
 
-async def draw_leaderboard(bot: Bot, page: int) -> bytes:
+async def draw_leaderboard(bot: Bot, page: int) -> BytesIO:
     return await asyncio.get_event_loop().run_in_executor(
         None, _draw_leaderboard, bot, page, await bot.db.get_top_data(page)
     )
 
 
-def _draw_leaderboard(bot: Bot, page: int, top_data) -> bytes:
+def _draw_leaderboard(bot: Bot, page: int, top_data) -> BytesIO:
     img = Image.open("res/template.png")
     draw = ImageDraw.Draw(img)
     font = get_font(45)
@@ -93,7 +94,9 @@ def _draw_leaderboard(bot: Bot, page: int, top_data) -> bytes:
         font=page_font,
         anchor="ls",
     )
-    return img.tobytes()
+    with BytesIO() as bi:
+        img.save(bi)
+    return bi
 
 
 async def draw_rank_card(
@@ -101,9 +104,8 @@ async def draw_rank_card(
     position: int,
     next_role: Role,
     current_score: int,
-    score_to_next_role: int = None,
-    custom_bg_path: str = None,
-) -> bytes:
+    score_to_next_role: int = None
+) -> BytesIO:
     return await asyncio.get_running_loop().run_in_executor(
         None,
         _draw_rank_card,
@@ -112,7 +114,6 @@ async def draw_rank_card(
         next_role,
         current_score,
         score_to_next_role,
-        custom_bg_path,
     )
 
 
@@ -122,7 +123,7 @@ def _draw_rank_card(
     next_role: Role | None,
     current_score: int,
     score_to_next_role: int | None = None,
-) -> bytes:
+) -> BytesIO:
     if not next_role:
         next_role_name = "All roles obtained!"
         next_role_color = WHITE
@@ -186,7 +187,9 @@ def _draw_rank_card(
         SCORE_POSITION, f"{score_string}", fill=WHITE, font=score_role_font, anchor="mm"
     )
 
-    return template.tobytes()
+    with BytesIO() as bi:
+        template.save(bi)
+    return bi
 
 
 def number_to_numstring(num):

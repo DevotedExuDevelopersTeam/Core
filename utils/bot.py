@@ -2,6 +2,7 @@ import importlib.util
 import inspect
 import os
 import sys
+import traceback
 from datetime import datetime, timedelta
 
 import disnake
@@ -86,6 +87,32 @@ class Bot(commands.Bot):
 
             elif full_path.endswith(".py"):
                 self.auto_setup(full_path[:-3].replace("/", "."))
+
+    async def on_error(self, event_method: str, *args, **kwargs):
+        self.log.error("Unhandled exception occurred at %s", event_method)
+        await self.log_error()
+
+    async def log_error(self):
+        now = datetime.now().date()
+        month_path = f"logs/{now.month}"
+        if not os.path.exists(month_path):
+            os.mkdir(month_path)
+
+        path = f"{month_path}/{now.day}.log.err"
+        with open(path, "a") as f:
+            f.write("\n" + "-" * 50)
+            f.write(f"\n{datetime.now()}\n")
+            tb = traceback.format_exc()
+            f.write(tb)
+
+        await self.dis_log.log_channel.send(
+            self.owner.mention,
+            embed=disnake.Embed(
+                colour=0xFF0000,
+                title=f"❗ Unexpected error occurred",
+            ).add_field("Traceback (most recent call last):", tb[-1000:], inline=False),
+            file=disnake.File(path),
+        )
 
 
 class DisLogger:

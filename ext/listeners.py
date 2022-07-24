@@ -4,10 +4,15 @@ import disnake
 
 from utils.bot import Bot
 from utils.cog import Cog
-from utils.constants import COUNTING_CHANNEL_ID, FILEMUTED_ROLE_ID, DELETED_MESSAGES_LOG_CHANNEL_ID, GOODBYE_CHANNEL_ID, \
-    HU_CHANNEL_ID, \
-    WELCOME_CHANNEL_ID
-from utils.utils import ordinal_num, timedelta_to_full_str
+from utils.constants import (
+    COUNTING_CHANNEL_ID,
+    DELETED_MESSAGES_LOG_CHANNEL_ID,
+    FILEMUTED_ROLE_ID,
+    GOODBYE_CHANNEL_ID,
+    HU_CHANNEL_ID,
+    WELCOME_CHANNEL_ID,
+)
+from utils.utils import ordinal_num
 
 
 class MessageListeners(Cog):
@@ -25,7 +30,10 @@ class MessageListeners(Cog):
     async def filemuted_controller(self, message: disnake.Message):
         if self.filemuted_role in message.author.roles and len(message.attachments) > 0:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, you cannot send attachments when filemuted!", delete_after=3)
+            await message.channel.send(
+                f"{message.author.mention}, you cannot send attachments when filemuted!",
+                delete_after=3,
+            )
 
     @Cog.listener("on_message_delete")
     async def deleted_messages_log(self, message: disnake.Message):
@@ -39,10 +47,11 @@ class MessageListeners(Cog):
                 color=0xFFFF00,
                 title=f"Message deleted from #{message.channel.name}",
                 description=message.content,
-                timestamp=datetime.now()
-            )
-            .set_author(name=message.author, icon_url=message.author.display_avatar.url),
-            files=[await a.to_file() for a in message.attachments]
+                timestamp=datetime.now(),
+            ).set_author(
+                name=message.author, icon_url=message.author.display_avatar.url
+            ),
+            files=[await a.to_file() for a in message.attachments],
         )
 
     @Cog.listener("on_message")
@@ -52,10 +61,14 @@ class MessageListeners(Cog):
 
         if message.channel.id == HU_CHANNEL_ID and message.content.lower() != "hu":
             await message.delete()
-            await message.channel.send(f"{message.author.mention} hu only!", delete_after=3)
+            await message.channel.send(
+                f"{message.author.mention} hu only!", delete_after=3
+            )
 
-        elif message.channel.id == COUNTING_CHANNEL_ID \
-                and not disnake.utils.escape_markdown(message.content).isnumeric():
+        elif (
+            message.channel.id == COUNTING_CHANNEL_ID
+            and not disnake.utils.escape_markdown(message.content).isnumeric()
+        ):
             await message.delete()
             await message.channel.send(f"{message.author.mention} numbers only!")
 
@@ -68,8 +81,10 @@ class MembersListeners(Cog):
             self.bot.log.warning("Failed to get welcome channel")
             return
 
-        await channel.send(f"{member.mention} has joined! \
-They are our **{ordinal_num(member.guild.member_count)}** member!")
+        await channel.send(
+            f"{member.mention} has joined! \
+They are our **{ordinal_num(member.guild.member_count)}** member!"
+        )
 
     @Cog.listener("on_member_remove")
     async def member_goodbyer(self, member: disnake.Member):

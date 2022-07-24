@@ -41,4 +41,8 @@ asyncio.run_coroutine_threadsafe(asyncf(), asyncio.get_running_loop())"""
         try:
             exec(code, env)
         except Exception as e:
-            await inter.send(embed=disnake.Embed(color=0xFF0000, title="Exception Occurred").add_field("Exception", str(e)))
+            await inter.send(
+                embed=disnake.Embed(
+                    color=0xFF0000, title="Exception Occurred"
+                ).add_field("Exception", str(e))
+            )

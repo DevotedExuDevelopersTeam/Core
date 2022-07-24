@@ -22,7 +22,9 @@ class TimeConversionFailure(CustomError):
 
 class HierarchyError(CustomError):
     def __init__(self):
-        super().__init__("You cannot use this command on someone with equal or higher top role than you")
+        super().__init__(
+            "You cannot use this command on someone with equal or higher top role than you"
+        )
 
 
 class RuleNotFound(CustomError):

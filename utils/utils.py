@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Iterable
 
 
@@ -43,11 +43,7 @@ def datetime_to_timestamp(dt: datetime, modifier: str = "F") -> str:
 
 
 def ordinal_num(num: int) -> str:
-    d = {
-        1: "st",
-        2: "nd",
-        3: "rd"
-    }
+    d = {1: "st", 2: "nd", 3: "rd"}
     return str(num) + d.get(num % 10, "th")
 
 

@@ -22,7 +22,7 @@ class BaseView(disnake.ui.View, Generic[T]):
         disable_after_interaction: bool = True,
     ):
         self.value: T = None
-        self.inter: disnake.MessageInteraction| None = None
+        self.inter: disnake.MessageInteraction | None = None
         self.user_id = user_id
         self.disable_after_interaction = disable_after_interaction
         super().__init__()
@@ -54,4 +54,10 @@ class BaseView(disnake.ui.View, Generic[T]):
 
 class ConfirmationView(BaseView):
     def __init__(self, user_id: int):
-        super().__init__(user_id, [Button(True, label="Yes", style=disnake.ButtonStyle.green), Button(False, label="No", style=disnake.ButtonStyle.red)])
+        super().__init__(
+            user_id,
+            [
+                Button(True, label="Yes", style=disnake.ButtonStyle.green),
+                Button(False, label="No", style=disnake.ButtonStyle.red),
+            ],
+        )

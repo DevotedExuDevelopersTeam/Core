@@ -11,13 +11,14 @@ from utils.errors import RuleNotFound
 
 class TimeConverter(Converter, timedelta):
     @converter_method
-    async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> timedelta:
+    async def convert(
+        self, inter: disnake.ApplicationCommandInteraction, argument: str
+    ) -> timedelta:
         arg = argument.lower().replace(" ", "")
         values = {"days": 0, "hours": 0, "minutes": 0, "seconds": 0}
         for k in values.copy():
             try:
-                value = search(r"\d+" + k[0],
-                               arg).group()
+                value = search(r"\d+" + k[0], arg).group()
                 values[k] = int(value.replace(k[0], ""))
             except (AttributeError, ValueError):
                 pass
@@ -36,7 +37,9 @@ class Rule:
 
 class RuleConverter(Converter, Rule):
     @converter_method
-    async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> Rule:
+    async def convert(
+        self, inter: disnake.ApplicationCommandInteraction, argument: str
+    ) -> Rule:
         argument = argument.strip().lower()
         rules = await get_rules(inter.bot)
         if argument not in rules:

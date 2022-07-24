@@ -9,7 +9,12 @@ _cache: dict[str, str] = {}
 async def get_rules(bot: Bot) -> dict[str, str]:
     global _cache
     if len(_cache) == 0:
-        _cache = {r["id"]: r["content"] for r in await bot.db.execute("SELECT id, content FROM rules", fetch_mode=FetchMode.ALL)}
+        _cache = {
+            r["id"]: r["content"]
+            for r in await bot.db.execute(
+                "SELECT id, content FROM rules", fetch_mode=FetchMode.ALL
+            )
+        }
     return _cache
 
 

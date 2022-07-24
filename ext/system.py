@@ -19,7 +19,11 @@ class SystemLoops(Cog):
     async def temproles_and_locked_channels_remover(self):
         await self.bot.wait_until_ready()
         now = datetime.now()
-        records = await self.bot.db.execute("SELECT * FROM temproles WHERE remove_at < $1", now, fetch_mode=FetchMode.ALL)
+        records = await self.bot.db.execute(
+            "SELECT * FROM temproles WHERE remove_at < $1",
+            now,
+            fetch_mode=FetchMode.ALL,
+        )
         for r in records:
             member = self.bot.server.get_member(r["id"])
             role = self.bot.server.get_role(r["role_id"])
@@ -33,21 +37,31 @@ class SystemLoops(Cog):
 
         await self.bot.db.execute("DELETE FROM temproles WHERE remove_at < $1", now)
 
-        records = await self.bot.db.execute("SELECT id FROM locked_channels WHERE unlock_at < $1", now, fetch_mode=FetchMode.ALL)
+        records = await self.bot.db.execute(
+            "SELECT id FROM locked_channels WHERE unlock_at < $1",
+            now,
+            fetch_mode=FetchMode.ALL,
+        )
         for r in records:
             channel = self.bot.server.get_channel(r["id"])
             if channel is None:
                 self.bot.log.warning("Failed to unlock channel %s", r["id"])
                 continue
-            await channel.set_permissions(self.bot.server.default_role, send_messages=None)
+            await channel.set_permissions(
+                self.bot.server.default_role, send_messages=None
+            )
 
-        await self.bot.db.execute("DELETE FROM locked_channels WHERE unlock_at < $1", now)
+        await self.bot.db.execute(
+            "DELETE FROM locked_channels WHERE unlock_at < $1", now
+        )
 
     @tasks.loop(minutes=30)
     async def bans_remover(self):
         await self.bot.wait_until_ready()
         now = datetime.now()
-        records = await self.bot.db.execute("SELECT * FROM bans WHERE unban_at < $1", now, fetch_mode=FetchMode.ALL)
+        records = await self.bot.db.execute(
+            "SELECT * FROM bans WHERE unban_at < $1", now, fetch_mode=FetchMode.ALL
+        )
         for r in records:
             try:
                 await self.bot.server.unban(disnake.Object(r["id"]))
@@ -59,4 +73,7 @@ class SystemLoops(Cog):
     @tasks.loop(hours=12)
     async def warnings_remover(self):
         await self.bot.wait_until_ready()
-        await self.bot.db.execute("DELETE FROM warns WHERE issued_at < $1", datetime.now() - timedelta(days=30))
+        await self.bot.db.execute(
+            "DELETE FROM warns WHERE issued_at < $1",
+            datetime.now() - timedelta(days=30),
+        )

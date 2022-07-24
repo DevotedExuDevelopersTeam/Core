@@ -1,5 +1,6 @@
 import disnake
 from disnake.ext.commands import Context, check
+
 from utils.bot import Bot
 from utils.errors import StaffOnly
 
@@ -13,4 +14,5 @@ async def is_staff(bot: Bot, inter: disnake.ApplicationCommandInteraction) -> bo
 def staff_only():
     async def predicate(ctx: Context | disnake.ApplicationCommandInteraction):
         return await is_staff(ctx.bot, ctx)
+
     return check(predicate)

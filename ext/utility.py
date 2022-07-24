@@ -3,7 +3,6 @@ from uuid import uuid4
 import disnake
 from disnake.ext import commands
 
-from utils.checks import is_staff
 from utils.cog import Cog
 
 
@@ -13,7 +12,9 @@ class ButtonRoles(Cog):
 
         self._button_roles: dict[str, int] = {}
 
-    async def cog_slash_command_check(self, inter: disnake.ApplicationCommandInteraction) -> bool:
+    async def cog_slash_command_check(
+        self, inter: disnake.ApplicationCommandInteraction
+    ) -> bool:
         if inter.user.guild_permissions.manage_guild:
             return True
         raise commands.MissingPermissions(["manage_guild"])
@@ -36,7 +37,10 @@ class ButtonRoles(Cog):
 
         target_role = inter.guild.get_role(roles[id])
         if target_role is None:
-            await inter.send("Sorry, couldn't find the role associated with this button. It might have been deleted", ephemeral=True)
+            await inter.send(
+                "Sorry, couldn't find the role associated with this button. It might have been deleted",
+                ephemeral=True,
+            )
         elif target_role in inter.user.roles:
             await inter.send(f"Removed {target_role.mention} from you", ephemeral=True)
             await inter.user.remove_roles(target_role)
@@ -45,7 +49,13 @@ class ButtonRoles(Cog):
             await inter.user.add_roles(target_role)
 
     @commands.slash_command(name="addbuttonrole", description="Adds a button role")
-    async def addbuttonrole(self, inter: disnake.ApplicationCommandInteraction, message_id: int, button_name, role: disnake.Role):
+    async def addbuttonrole(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        message_id: int,
+        button_name,
+        role: disnake.Role,
+    ):
         try:
             message: disnake.Message = await inter.channel.fetch_message(message_id)
         except disnake.NotFound:
@@ -60,8 +70,12 @@ class ButtonRoles(Cog):
         await self.bot.db.add_button_role(id, role.id, message_id)
         await inter.send("Added a new button role")
 
-    @commands.slash_command(name="removebuttonrole", description="Removes a button role")
-    async def removebuttonrole(self, inter: disnake.ApplicationCommandInteraction, message_id: int, button_name):
+    @commands.slash_command(
+        name="removebuttonrole", description="Removes a button role"
+    )
+    async def removebuttonrole(
+        self, inter: disnake.ApplicationCommandInteraction, message_id: int, button_name
+    ):
         try:
             message: disnake.Message = await inter.channel.fetch_message(message_id)
         except disnake.NotFound:
@@ -71,11 +85,17 @@ class ButtonRoles(Cog):
         await inter.response.defer()
         view = disnake.ui.View.from_message(message)
         for component in view.children:
-            if isinstance(component, disnake.ui.Button) and component.label == button_name:
+            if (
+                isinstance(component, disnake.ui.Button)
+                and component.label == button_name
+            ):
                 view.remove_item(component)
                 await message.edit(view=view)
                 await self.bot.db.remove_button_role(component.custom_id)
                 await inter.send("Successfully removed button role from that message")
                 return
 
-        await inter.send(f"Couldn't find any buttons named `{button_name}` in that message", ephemeral=True)
+        await inter.send(
+            f"Couldn't find any buttons named `{button_name}` in that message",
+            ephemeral=True,
+        )

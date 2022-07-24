@@ -25,7 +25,13 @@ class Bot(commands.Bot):
         intents.message_content = True
         intents.members = True
         intents.dm_messages = False
-        super().__init__(intents=intents, activity=disnake.Activity(type=disnake.ActivityType.watching, name="the server"), status=disnake.Status.idle)
+        super().__init__(
+            intents=intents,
+            activity=disnake.Activity(
+                type=disnake.ActivityType.watching, name="the server"
+            ),
+            status=disnake.Status.idle,
+        )
         self.log = Logger()
         self.db = Database()
         self.dis_log = DisLogger(self)
@@ -71,7 +77,10 @@ class Bot(commands.Bot):
         module = importlib.import_module(module_name, None)
         sys.modules[module_name] = module
         members = inspect.getmembers(
-            module, lambda x: inspect.isclass(x) and issubclass(x, commands.Cog) and x.__name__ != "Cog"
+            module,
+            lambda x: inspect.isclass(x)
+            and issubclass(x, commands.Cog)
+            and x.__name__ != "Cog",
         )
         for member in members:
             self.add_cog(member[1](self))
@@ -125,16 +134,31 @@ class DisLogger:
         self.log_channel = self.bot.server.get_channel(LOG_CHANNEL_ID)
         assert self.log_channel is not None, "Failed to load log channel"
 
-    async def log_target_action(self, action_name: str, target: disnake.Member | disnake.TextChannel, issuer: disnake.Member, duration: timedelta = None, violated_rule: str = None, color: int = 0xFF0000):
-        embed = disnake.Embed(
-            color=color,
-            title=action_name.capitalize(),
-            timestamp=datetime.now())\
-            .add_field("Target", f"**{target}** ({target.mention})\nID: {target.id}")\
-            .add_field("Issued By", f"{issuer.top_role.mention} **{issuer}** ({issuer.mention})\nID: {issuer.id}")
+    async def log_target_action(
+        self,
+        action_name: str,
+        target: disnake.Member | disnake.TextChannel,
+        issuer: disnake.Member,
+        duration: timedelta = None,
+        violated_rule: str = None,
+        color: int = 0xFF0000,
+    ):
+        embed = (
+            disnake.Embed(
+                color=color, title=action_name.capitalize(), timestamp=datetime.now()
+            )
+            .add_field("Target", f"**{target}** ({target.mention})\nID: {target.id}")
+            .add_field(
+                "Issued By",
+                f"{issuer.top_role.mention} **{issuer}** ({issuer.mention})\nID: {issuer.id}",
+            )
+        )
 
         if duration is not None:
-            embed.add_field("Duration", f"**{timedelta_to_full_str(duration)}** (ends at {timedelta_to_timestamp(duration)})")
+            embed.add_field(
+                "Duration",
+                f"**{timedelta_to_full_str(duration)}** (ends at {timedelta_to_timestamp(duration)})",
+            )
 
         if violated_rule is not None:
             embed.add_field("Violated Rule", violated_rule)

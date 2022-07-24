@@ -121,7 +121,7 @@ def _draw_rank_card(
     position: int,
     next_role: Role | None,
     current_score: int,
-    score_to_next_role: int | None = None
+    score_to_next_role: int | None = None,
 ) -> bytes:
     if not next_role:
         next_role_name = "All roles obtained!"

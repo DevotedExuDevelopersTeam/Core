@@ -110,7 +110,7 @@ python-versions = "*"
 
 [[package]]
 name = "exencolor"
-version = "1.1.2"
+version = "1.1.3"
 description = "A modern module for colored output."
 category = "main"
 optional = false
@@ -244,14 +244,7 @@ version = "1.0.1"
 description = "A module for evaluating math expressions without eval()"
 category = "main"
 optional = false
-python-versions = "^3.10"
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/Exenifix/strmath"
-reference = "v1.0.1"
-resolved_reference = "5a06ffef3097dd378d9261ee1605c931aef49799"
+python-versions = ">=3.10,<4.0"
 
 [[package]]
 name = "tabulate"
@@ -305,7 +298,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "09441e07c0fdb1a5a05e7bbb1d81fe7506c86fc9055e807198e0cd626f7bc154"
+content-hash = "9a77c80018f6d1201ad5bae7accdcd1e37df642aeb281dd10a0f467b94d05d93"
 
 [metadata.files]
 aiohttp = [
@@ -439,8 +432,8 @@ distlib = [
     {file = "distlib-0.3.5.tar.gz", hash = "sha256:a7f75737c70be3b25e2bee06288cec4e4c221de18455b2dd037fe2a795cab2fe"},
 ]
 exencolor = [
-    {file = "exencolor-1.1.2-py3-none-any.whl", hash = "sha256:2e9fc23977eb9e5134cbb4b241b6bd3c2efb8444ef4bcaf67eae217d76992429"},
-    {file = "exencolor-1.1.2.tar.gz", hash = "sha256:8ceb6bff6dc3caba1d8b36178e35a2cf2747809be030bd52c27e3d9dcf096f17"},
+    {file = "exencolor-1.1.3-py3-none-any.whl", hash = "sha256:7f59c558bf4937443a27b15e6ff2245280ede6e1eeccbac95dae21b53330bef5"},
+    {file = "exencolor-1.1.3.tar.gz", hash = "sha256:248e12759db8c5c6d9a120699fdda61932b41c36f984fccfdbcd7c03ad1ae5fa"},
 ]
 exencolorlogs = [
     {file = "exencolorlogs-1.0.2-py3-none-any.whl", hash = "sha256:902452e5e7ef0661b8476cce48ca16546dc6b4462cb9ed70261d27f0b52534b5"},
@@ -691,7 +684,10 @@ six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
-strmath = []
+strmath = [
+    {file = "strmath-1.0.1-py3-none-any.whl", hash = "sha256:47439c2aa0a202f1e3233841693543bd872796d238464565d6da12023e9f50a6"},
+    {file = "strmath-1.0.1.tar.gz", hash = "sha256:b3df1358cb469f57bff2f926cd1c2ae4000de0291adb57cda3582bb158596585"},
+]
 tabulate = [
     {file = "tabulate-0.8.10-py3-none-any.whl", hash = "sha256:0ba055423dbaa164b9e456abe7920c5e8ed33fcc16f6d1b2f2d152c8e1e8b4fc"},
     {file = "tabulate-0.8.10-py3.8.egg", hash = "sha256:436f1c768b424654fce8597290d2764def1eea6a77cfa5c33be00b1bc0f4f63d"},

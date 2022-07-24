@@ -399,7 +399,7 @@ class ChannelsModeration(Cog):
         if message is None:
             await inter.send("Could not find a message with that ID", ephemeral=True)
         await inter.response.defer(ephemeral=True)
-        purged = len(await inter.channel.purge(limit=500, check=lambda m: not m.pinned))
+        purged = len(await inter.channel.purge(limit=500, check=lambda m: not m.pinned, after=inter.created_at))
         await inter.send(
             f"Successfully purged **{purged}** messages in {inter.channel.mention}",
             ephemeral=True,

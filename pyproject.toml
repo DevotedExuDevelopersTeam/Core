@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "Core"
+version = "1.0"
+description = ""
+authors = ["Exenifix"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+disnake = "^2.5.1"
+exencolorlogs = "^1.0.2"
+asyncpg = "^0.26.0"
+Pillow = "^9.2.0"
+tabulate = "^0.8.10"
+strmath = {git = "https://github.com/Exenifix/strmath", rev = "v1.0.1"}
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  main:
+    build: .
+    container_name: core
+    network_mode: host
+    volumes:
+      - /home/exenifix/core/backgrounds:/app/backgrounds
+    environment:
+      - TOKEN
+      - DATABASE=core
+      - PASSWORD
+      - USER
+      - GOOGLE_API_KEY

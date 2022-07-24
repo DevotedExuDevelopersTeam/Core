@@ -48,6 +48,14 @@ def generate_id():
     return f"{int(datetime.now().timestamp())}{str(randint(1000, 9999))}"
 
 
+async def resize_bg(bg_path: str):
+    await asyncio.get_event_loop().run_in_executor(None, _resize_bg, bg_path)
+
+
+def _resize_bg(bg_path: str):
+    Image.open(bg_path).resize(Image.open("res/rank_template.png").size).save(bg_path)
+
+
 async def draw_leaderboard(bot: Bot, page: int) -> BytesIO:
     return await asyncio.get_event_loop().run_in_executor(
         None, _draw_leaderboard, bot, page, await bot.db.get_top_data(page)

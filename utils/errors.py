@@ -45,7 +45,8 @@ class YoutubeFetchFailure(CustomError):
 
 
 known_exceptions = [
-    inspect.getmembers(
+    i[1]
+    for i in inspect.getmembers(
         sys.modules[__name__],
         lambda x: inspect.isclass(x) and issubclass(x, CustomError),
     )

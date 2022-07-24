@@ -8,6 +8,7 @@ from utils.autocomplete import rules_autocomplete
 from utils.checks import staff_only
 from utils.cog import Cog
 from utils.converters import RuleConverter
+from utils.image_generator import resize_bg
 from utils.utils import datetime_to_timestamp, timedelta_to_full_str
 from utils.views import ConfirmationView
 
@@ -63,7 +64,8 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
     ):
         await inter.response.defer()
         # noinspection PyTypeChecker
-        await bg.save(f"backgrounds/{inter.author.id}.png")
+        await bg.save(path := f"backgrounds/{inter.author.id}.png")
+        await resize_bg(path)
 
     @commands.slash_command(name="afk", description="Sets an AFK")
     async def afk(self, inter: disnake.ApplicationCommandInteraction, text: str):
@@ -98,7 +100,6 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         await inter.send(
             f"Are you sure you want to DM {user.mention} this text?",
             embed=disnake.Embed(description=text),
-            ephemeral=True,
             view=view,
         )
         r, inter = await view.get_result()

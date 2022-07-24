@@ -22,7 +22,7 @@ class Miscellaneous(Cog):
             await self.bot.db.reset_member_afk(message.author.id)
             await message.channel.send(
                 f"{message.author.mention}, removed your AFK! \
-        You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
+You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
             )
             return
 
@@ -99,6 +99,7 @@ class Miscellaneous(Cog):
             f"Are you sure you want to DM {user.mention} this text?",
             embed=disnake.Embed(description=text),
             ephemeral=True,
+            view=view
         )
         r, inter = await view.get_result()
         if r:

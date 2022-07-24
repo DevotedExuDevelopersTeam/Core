@@ -32,7 +32,7 @@ class Rule:
     content: str
 
     def __str__(self):
-        return f"{self.id} {self.content}"
+        return f"{self.id}. {self.content}"
 
 
 class RuleConverter(Converter, Rule):

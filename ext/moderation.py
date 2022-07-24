@@ -33,7 +33,7 @@ class ModerationCommands(Cog):
         await user.timeout(duration=time, reason=f"Mod: {inter.user} | Rule: {rule.id}")
 
         await inter.send(
-            f"{user.mention} was timeouted for `{time}`. Violated rule: `{rule}`"
+            f"{user.mention} was timed out for `{timedelta_to_full_str(time)}`. Violated rule: `{rule}`"
         )
         await self.bot.dis_log.log_target_action(
             "Mute", user, inter.user, time, str(rule)
@@ -78,7 +78,7 @@ class ModerationCommands(Cog):
         await user.add_roles(filemuted_role)
         await self.bot.db.add_temprole(user.id, filemuted_role.id, time)
 
-        await inter.send(f"{user.mention} was filemuted for `{time}`.")
+        await inter.send(f"{user.mention} was filemuted for `{timedelta_to_full_str(time)}`.")
         await self.bot.dis_log.log_target_action("Filemute", user, inter.user)
 
     @commands.slash_command(
@@ -98,7 +98,7 @@ class ModerationCommands(Cog):
             await inter.send("That user is not filemuted", ephemeral=True)
             return
 
-        await user.add_roles(filemuted_role)
+        await user.remove_roles(filemuted_role)
 
         await inter.send(f"Took off the filemute from {user.mention}")
         await self.bot.dis_log.log_target_action("Unfilemute", user, inter.user)
@@ -229,7 +229,7 @@ Violated rule: `{rule}`. This warning will automatically be removed from you in 
         embed = disnake.Embed(
             color=0x00FFFF,
             title=f"{user}'s Warnings",
-            description=f"This user has totally **{len(warnings)}** warnings",
+            description=f"This user has totally **{len(warnings)}** warning({s_(len(warnings))}",
         )
 
         for warning in warnings:
@@ -294,7 +294,7 @@ class ChannelsModeration(Cog):
             return
 
         await channel.set_permissions(
-            inter.guild.default_role, send_messages=False, reason=f"Mod: {inter.user}"
+            inter.guild.default_role, overwrite=disnake.PermissionOverwrite(send_messages=False), reason=f"Mod: {inter.user}"
         )
         if time is not None:
             await self.bot.db.add_locked_channel(channel.id, time)
@@ -324,7 +324,7 @@ class ChannelsModeration(Cog):
             return
 
         await channel.set_permissions(
-            inter.guild.default_role, send_messages=None, reason=f"Mod: {inter.user}"
+            inter.guild.default_role, overwrite=disnake.PermissionOverwrite(send_messages=None), reason=f"Mod: {inter.user}"
         )
         await self.bot.db.remove_locked_channel(channel.id)
         await inter.send(f"Unlocked channel {channel.mention}")
@@ -411,7 +411,7 @@ class ChannelsModeration(Cog):
         for c in self.locked_channels:
             await c.set_permissions(
                 inter.guild.default_role,
-                send_messages=False,
+                overwrite=disnake.PermissionOverwrite(send_messages=False),
                 reason=f"Server lock done by {inter.user}",
             )
         await inter.send(
@@ -425,7 +425,7 @@ class ChannelsModeration(Cog):
         for c in self.locked_channels:
             await c.set_permissions(
                 inter.guild.default_role,
-                send_messages=None,
+                overwrite=disnake.PermissionOverwrite(send_messages=None),
                 reason=f"Server unlock done by {inter.user}",
             )
         await inter.send("Unlocked the server")

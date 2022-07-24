@@ -6,6 +6,7 @@ services:
     network_mode: host
     volumes:
       - /home/exenifix/core-data/backgrounds:/app/backgrounds
+      - /home/exenifix/core-data/logs:/app/logs
     environment:
       - TOKEN
       - DATABASE=core

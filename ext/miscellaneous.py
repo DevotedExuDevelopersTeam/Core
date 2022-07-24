@@ -61,7 +61,9 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
 
     @commands.slash_command(name="setbg", description="Sets your rank card background")
     async def setbg(
-        self, inter: disnake.ApplicationCommandInteraction, bg: disnake.Attachment = None
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        bg: disnake.Attachment = None,
     ):
         path = f"backgrounds/{inter.author.id}.png"
         if bg is None:
@@ -84,7 +86,9 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         inter: disnake.ApplicationCommandInteraction,
         rule: RuleConverter = commands.Param(autocomplete=rules_autocomplete),
     ):
-        await inter.send(embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=str(rule)))
+        await inter.send(
+            embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=str(rule))
+        )
 
     @commands.slash_command(
         name="math", description="Evaluates a simple math expression"

@@ -57,7 +57,8 @@ class Levels(Cog):
     @Cog.listener("on_message")
     async def xp_controller(self, message: disnake.Message):
         if (
-            message.author.bot
+            isinstance(message.author, disnake.User)
+            or message.author.bot
             or message.channel.id in XP_IGNORED_CHANNELS_IDS
             or message.channel.category_id in XP_IGNORED_CHANNELS_IDS
             or self._is_member_on_cooldown(message.author.id)

@@ -28,6 +28,8 @@ class MessageListeners(Cog):
 
     @Cog.listener("on_message")
     async def filemuted_controller(self, message: disnake.Message):
+        if isinstance(message.author, disnake.User):
+            return
         if self.filemuted_role in message.author.roles and len(message.attachments) > 0:
             await message.delete()
             await message.channel.send(

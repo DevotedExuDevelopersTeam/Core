@@ -3,13 +3,14 @@ from datetime import timedelta
 from re import search
 
 import disnake
-from disnake.ext.commands import Converter
+from disnake.ext.commands import Converter, converter_method
 
 from utils.autocomplete import get_rules
 from utils.errors import RuleNotFound
 
 
 class TimeConverter(Converter, timedelta):
+    @converter_method
     async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> timedelta:
         arg = argument.lower().replace(" ", "")
         values = {"days": 0, "hours": 0, "minutes": 0, "seconds": 0}
@@ -34,6 +35,7 @@ class Rule:
 
 
 class RuleConverter(Converter, Rule):
+    @converter_method
     async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> Rule:
         argument = argument.strip().lower()
         rules = await get_rules(inter.bot)

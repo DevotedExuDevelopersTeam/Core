@@ -142,7 +142,7 @@ class Database:
         return [
             Warn(*r.values())
             for r in await self.execute(
-                "SELECT (id, target_id, issuer_id, issued_at, rule_violated) \
+                "SELECT id, target_id, issuer_id, issued_at, rule_violated \
 FROM warns WHERE target_id = $1",
                 user_id,
                 fetch_mode=FetchMode.ALL,
@@ -277,7 +277,7 @@ FROM warns WHERE target_id = $1",
         return {
             r["id"]: r["role_id"]
             for r in await self.execute(
-                "SELECT (id, role_id) FROM button_roles", fetch_mode=FetchMode.ALL
+                "SELECT id, role_id FROM button_roles", fetch_mode=FetchMode.ALL
             )
         }
 

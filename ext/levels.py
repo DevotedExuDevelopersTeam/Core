@@ -89,7 +89,7 @@ class Levels(Cog):
 
         await inter.send(
             file=disnake.File(
-                await draw_rank_card(
+                f := await draw_rank_card(
                     user,
                     await self.bot.db.get_lb_position(current_score),
                     next_role,
@@ -98,6 +98,7 @@ class Levels(Cog):
                 )
             )
         )
+        f.close()
 
     @commands.slash_command(
         name="leaderboard", description="Displays user's leaderboard"
@@ -107,7 +108,8 @@ class Levels(Cog):
         self, inter: disnake.ApplicationCommandInteraction, page: int = 1
     ):
         await inter.response.defer()
-        await inter.send(file=disnake.File(await draw_leaderboard(self.bot, page)))
+        await inter.send(file=disnake.File(f := await draw_leaderboard(self.bot, page)))
+        f.close()
 
     @commands.slash_command(name="levels", description="Shows all leveled roles")
     @commands.cooldown(1, 15, commands.BucketType.user)

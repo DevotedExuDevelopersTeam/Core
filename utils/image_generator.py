@@ -94,9 +94,9 @@ def _draw_leaderboard(bot: Bot, page: int, top_data) -> BytesIO:
         font=page_font,
         anchor="ls",
     )
-    with BytesIO() as bi:
-        img.save(bi, "PNG")
-        bi.seek(0)
+    bi = BytesIO()
+    img.save(bi, "PNG")
+    bi.seek(0)
     return bi
 
 
@@ -188,9 +188,9 @@ def _draw_rank_card(
         SCORE_POSITION, f"{score_string}", fill=WHITE, font=score_role_font, anchor="mm"
     )
 
-    with BytesIO() as bi:
-        template.save(bi, "PNG")
-        bi.seek(0)
+    bi = BytesIO()
+    template.save(bi, "PNG")
+    bi.seek(0)
     return bi
 
 

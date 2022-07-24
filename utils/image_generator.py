@@ -96,7 +96,7 @@ def _draw_leaderboard(bot: Bot, page: int, top_data) -> BytesIO:
     )
     with BytesIO() as bi:
         img.save(bi, "PNG")
-    bi.seek(0)
+        bi.seek(0)
     return bi
 
 
@@ -190,7 +190,7 @@ def _draw_rank_card(
 
     with BytesIO() as bi:
         template.save(bi, "PNG")
-    bi.seek(0)
+        bi.seek(0)
     return bi
 
 

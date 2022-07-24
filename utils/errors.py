@@ -1,5 +1,6 @@
 import inspect
 import sys
+from typing import Type
 
 import disnake
 from disnake.ext import commands
@@ -72,7 +73,7 @@ known_exceptions.extend(
 )
 
 
-def get_error_msg(error: commands.CommandError) -> str | UNKNOWN:
+def get_error_msg(error: commands.CommandError) -> str | Type[UNKNOWN]:
     if type(error) not in known_exceptions:
         return UNKNOWN
     else:

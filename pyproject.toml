@@ -1,6 +1,5 @@
 [tool.poetry]
 name = "Core"
-version = "1.0"
 description = ""
 authors = ["Exenifix"]
 

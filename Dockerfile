@@ -11,4 +11,4 @@ RUN poetry install
 COPY . .
 
 ENTRYPOINT ["poetry", "run", "python"]
-CMD ["bot.py"]
+CMD ["main.py"]

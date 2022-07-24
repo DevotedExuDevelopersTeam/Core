@@ -38,7 +38,7 @@ class Levels(Cog):
         roles_to_remove = unearned_roles & current_roles
         if len(roles_to_add) > 0:
             await member.add_roles(*[disnake.Object(i) for i in roles_to_add])
-            top_role = levels[max(filter(lambda x: score <= x, levels))]
+            top_role = levels[max(filter(lambda x: score >= x, levels))]
             if top_role in roles_to_add:
                 await channel.send(
                     f"GG {member.mention}, you just earned <@&{top_role}>!",

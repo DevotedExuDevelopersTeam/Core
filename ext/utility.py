@@ -3,6 +3,7 @@ from uuid import uuid4
 import disnake
 from disnake.ext import commands
 
+from utils.checks import staff_only
 from utils.cog import Cog
 
 
@@ -102,3 +103,9 @@ class ButtonRoles(Cog):
             f"Couldn't find any buttons named `{button_name}` in that message",
             ephemeral=True,
         )
+
+    @commands.slash_command(name="say", description="Says stuff")
+    @staff_only()
+    async def say(self, inter: disnake.ApplicationCommandInteraction, stuff: str):
+        await inter.send("Ok", ephemeral=True)
+        await inter.channel.send(stuff)

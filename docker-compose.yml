@@ -5,10 +5,10 @@ services:
     container_name: core
     network_mode: host
     volumes:
-      - /home/exenifix/core/backgrounds:/app/backgrounds
+      - /home/exenifix/core-data/backgrounds:/app/backgrounds
     environment:
       - TOKEN
       - DATABASE=core
       - PASSWORD
-      - USER
+      - USER=core
       - GOOGLE_API_KEY

@@ -1,0 +1,23 @@
+name: deploy
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and Run
+        run: docker-compose up -d --build
+
+      - name: Display Logs
+        run: python3 -m exendlr core "bot is ready!"
+
+      - name: Cleanup Unused Images
+        run: docker image prune -f

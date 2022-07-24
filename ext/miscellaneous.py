@@ -78,13 +78,13 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         await self.bot.db.set_member_afk(inter.author.id, text)
         await inter.send(f"You are now AFK: `{text}`")
 
-    @commands.slash_command(name="rule", description="Shows rule")
+    @commands.slash_command(name="rule", description="Shows rule's contents")
     async def rule(
         self,
         inter: disnake.ApplicationCommandInteraction,
         rule: RuleConverter = commands.Param(autocomplete=rules_autocomplete),
     ):
-        await inter.send(str(rule))
+        await inter.send(embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=str(rule)))
 
     @commands.slash_command(
         name="math", description="Evaluates a simple math expression"

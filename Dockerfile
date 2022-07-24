@@ -4,7 +4,7 @@ RUN pip install --no-cache-dir -U poetry
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
-RUN poetry install
+RUN poetry install --no-dev
 
 COPY . .
 

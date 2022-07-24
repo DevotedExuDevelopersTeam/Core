@@ -12,7 +12,7 @@ async def get_rules(bot: Bot) -> dict[str, str]:
         _cache = {
             r["id"]: r["content"]
             for r in await bot.db.execute(
-                "SELECT id, content FROM rules", fetch_mode=FetchMode.ALL
+                "SELECT id, content FROM rules ORDER BY id", fetch_mode=FetchMode.ALL
             )
         }
     return _cache

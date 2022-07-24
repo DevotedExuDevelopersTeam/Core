@@ -139,7 +139,11 @@ class ModerationCommands(Cog):
 
     @commands.slash_command(name="unban", description="Unbans a user")
     @commands.has_permissions(ban_members=True)
-    async def unban(self, inter: disnake.ApplicationCommandInteraction, user_id: int):
+    async def unban(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user_id: int = commands.Param(large=True),
+    ):
         try:
             await inter.guild.unban(
                 disnake.Object(user_id), reason=f"Mod: {inter.user}"
@@ -381,7 +385,9 @@ class ChannelsModeration(Cog):
         name="purgetill", description="Purges all messages below the given"
     )
     async def purgetill(
-        self, inter: disnake.ApplicationCommandInteraction, message_id: int
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        message_id: int = commands.Param(large=True),
     ):
         message = await inter.channel.fetch_message(message_id)
         if message is None:

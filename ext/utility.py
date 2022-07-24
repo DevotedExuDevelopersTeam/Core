@@ -52,9 +52,9 @@ class ButtonRoles(Cog):
     async def addbuttonrole(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        message_id: int,
-        button_name,
-        role: disnake.Role,
+        message_id: int = commands.Param(large=True),
+        button_name: str = commands.Param(),
+        role: disnake.Role = commands.Param(),
     ):
         try:
             message: disnake.Message = await inter.channel.fetch_message(message_id)
@@ -74,7 +74,10 @@ class ButtonRoles(Cog):
         name="removebuttonrole", description="Removes a button role"
     )
     async def removebuttonrole(
-        self, inter: disnake.ApplicationCommandInteraction, message_id: int, button_name
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        message_id: int = commands.Param(large=True),
+        button_name: str = commands.Param(),
     ):
         try:
             message: disnake.Message = await inter.channel.fetch_message(message_id)

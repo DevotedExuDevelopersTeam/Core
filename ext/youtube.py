@@ -27,6 +27,7 @@ class YoutubeFetchers(Cog):
 
     @tasks.loop(minutes=5)
     async def youtube_fetcher(self):
+        await self.bot.wait_until_ready()
         youtubers = await self.bot.db.get_youtubers()
         for youtuber in youtubers:
             try:
@@ -45,6 +46,7 @@ class YoutubeFetchers(Cog):
 
     @tasks.loop(minutes=10)
     async def youtube_poster(self):
+        await self.bot.wait_until_ready()
         if len(self.queue) == 0:
             return
 

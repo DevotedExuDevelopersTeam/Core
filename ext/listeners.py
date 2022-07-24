@@ -72,7 +72,7 @@ class MessageListeners(Cog):
             and not disnake.utils.escape_markdown(message.content).isnumeric()
         ):
             await message.delete()
-            await message.channel.send(f"{message.author.mention} numbers only!")
+            await message.channel.send(f"{message.author.mention} numbers only!", delete_after=3)
 
 
 class MembersListeners(Cog):

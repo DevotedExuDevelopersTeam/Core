@@ -448,3 +448,34 @@ class ChannelsModeration(Cog):
             )
         await inter.send("Unlocked the server")
         self.locked_channels.clear()
+
+
+class RulesManagement(Cog):
+    async def cog_slash_command_check(
+        self, inter: disnake.ApplicationCommandInteraction
+    ) -> bool:
+        if inter.user.guild_permissions.manage_guild:
+            return True
+        raise commands.MissingPermissions(["Manage Guild"])
+
+    @commands.slash_command(name="addrule", description="Adds a rule")
+    async def addrule(
+        self, inter: disnake.ApplicationCommandInteraction, id: str, contents: str
+    ):
+        id = id if not id.endswith(".") else id[:-1]
+        if len(id) > 5:
+            await inter.send(
+                "Rule id cannot be longer than 5 characters", ephemeral=True
+            )
+            return
+        await self.bot.db.add_rule(id, contents)
+        await inter.send(f"Successfully added rule `{id}`")
+
+    @commands.slash_command(name="removerule", description="Removes a rule")
+    async def removerule(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        rule: RuleConverter = RulesAutocomplete,
+    ):
+        await self.bot.db.remove_rule(rule.id)
+        await inter.send(f"Successfully removed rule `{rule.id}`")

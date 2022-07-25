@@ -6,6 +6,10 @@ from utils.enums import FetchMode
 _cache: dict[str, str] = {}
 
 
+def invalidate():
+    _cache.clear()
+
+
 async def get_rules(bot: Bot) -> dict[str, str]:
     global _cache
     if len(_cache) == 0:

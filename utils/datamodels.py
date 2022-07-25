@@ -296,6 +296,14 @@ FROM warns WHERE target_id = $1",
     async def clear_button_roles(self, message_id: int):
         await self.execute("DELETE FROM button_roles WHERE message_id = $1", message_id)
 
+    async def add_rule(self, id: str, content: str):
+        await self.execute(
+            "INSERT INTO rules (id, content) VALUES ($1, $2)", id, content
+        )
+
+    async def remove_rule(self, id: str):
+        await self.execute("DELETE FROM rules WHERE id = $1", id)
+
     @property
     def pool(self):
         return self._pool

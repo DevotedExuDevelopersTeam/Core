@@ -72,9 +72,6 @@ def _draw_leaderboard(bot: Bot, page: int, top_data) -> BytesIO:
         if y_pos > 1070:
             break
         member = bot.get_user(entry["id"])
-        if member is None:
-            pos -= 1
-            continue
         member_name = str(member)
         while draw.textsize(member_name, font=get_font(45))[0] > 430:
             if member_name.endswith("..."):

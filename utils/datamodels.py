@@ -198,7 +198,7 @@ FROM warns WHERE target_id = $1",
 
     async def get_top_data(self, page: int):
         return await self.execute(
-            "SELECT id, score_total FROM scores WHERE NOT left_server ORDER BY score_total LIMIT 10 OFFSET $1",
+            "SELECT id, score_total FROM scores WHERE NOT left_server ORDER BY score_total DESC LIMIT 10 OFFSET $1",
             (page - 1) * 10,
             fetch_mode=FetchMode.ALL,
         )

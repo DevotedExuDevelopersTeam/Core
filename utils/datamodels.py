@@ -191,7 +191,7 @@ FROM warns WHERE target_id = $1",
 
     async def get_lb_position(self, score: int) -> int:
         return await self.execute(
-            "SELECT COUNT(*) + 1 FROM scores WHERE score_total > $1",
+            "SELECT COUNT(*) + 1 FROM scores WHERE score_total > $1 AND NOT left_server",
             score,
             fetch_mode=FetchMode.VAL,
         )

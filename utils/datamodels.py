@@ -295,6 +295,10 @@ FROM warns WHERE target_id = $1",
     async def clear_button_roles(self, message_id: int):
         await self.execute("DELETE FROM button_roles WHERE message_id = $1", message_id)
 
+    @property
+    def pool(self):
+        return self._pool
+
 
 class Cache:
     level_roles: dict[int, int]

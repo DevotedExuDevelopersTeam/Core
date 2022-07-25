@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS levels
 CREATE TABLE IF NOT EXISTS scores
 (
     id          BIGINT PRIMARY KEY,
-    score_total INT DEFAULT 0
+    score_total INT DEFAULT 0,
+    left_server BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS selfroles
@@ -72,3 +73,11 @@ CREATE TABLE IF NOT EXISTS youtubers
     is_premium       BOOLEAN,
     times_advertised INT DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS version
+(
+    id SMALLINT PRIMARY KEY,
+    version INT
+);
+
+INSERT INTO version (id, version) VALUES (0, 0) ON CONFLICT DO NOTHING;

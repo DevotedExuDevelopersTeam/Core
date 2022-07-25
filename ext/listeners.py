@@ -69,7 +69,7 @@ class MessageListeners(Cog):
 
         elif (
             message.channel.id == COUNTING_CHANNEL_ID
-            and not disnake.utils.escape_markdown(message.content).isnumeric()
+            and not disnake.utils.remove_markdown(message.content).isnumeric()
         ):
             await message.delete()
             await message.channel.send(

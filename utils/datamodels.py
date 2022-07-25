@@ -181,9 +181,10 @@ FROM warns WHERE target_id = $1",
             or 0
         )
 
-    async def update_users_score(self, user_id: int, delta: int) -> int:
+    async def update_users_score(self, user_id: int, delta: int):
         await self.execute(
-            "INSERT INTO scores (id, score_total) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET score_total = scores.score_total + $2",
+            "INSERT INTO scores (id, score_total) VALUES ($1, $2) "
+            "ON CONFLICT (id) DO UPDATE SET score_total = scores.score_total + $2, left_server = false",
             user_id,
             delta,
         )
@@ -197,7 +198,7 @@ FROM warns WHERE target_id = $1",
 
     async def get_top_data(self, page: int):
         return await self.execute(
-            "SELECT id, score_total FROM scores ORDER BY score_total LIMIT 10 OFFSET $1",
+            "SELECT id, score_total FROM scores WHERE NOT left_server ORDER BY score_total LIMIT 10 OFFSET $1",
             (page - 1) * 10,
             fetch_mode=FetchMode.ALL,
         )

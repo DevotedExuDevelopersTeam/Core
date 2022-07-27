@@ -12,8 +12,10 @@ from exencolorlogs import Logger
 from utils.constants import GUILD_ID, LOG_CHANNEL_ID, STAFF_ROLE_ID
 from utils.datamodels import Database
 from utils.utils import timedelta_to_full_str, timedelta_to_timestamp
+from utils.views import ApplicationControlsView, ApplicationsView
 
 REQUIRED_DIRS = ["logs", "backgrounds"]
+PERSISTENT_VIEWS = [ApplicationsView, ApplicationControlsView]
 
 
 class Bot(commands.Bot):
@@ -48,6 +50,7 @@ class Bot(commands.Bot):
         self.log.info("Running...")
         self.check_required_dirs()
         self.load_all_extensions("ext")
+        self.setup_persistent_views()
 
         token = os.getenv("TOKEN")
         assert token is not None, "No token was provided"
@@ -96,6 +99,10 @@ class Bot(commands.Bot):
 
             elif full_path.endswith(".py"):
                 self.auto_setup(full_path[:-3].replace("/", "."))
+
+    def setup_persistent_views(self):
+        for cls in PERSISTENT_VIEWS:
+            self.add_view(cls())
 
     async def on_error(self, event_method: str, *args, **kwargs):
         self.log.error("Unhandled exception occurred at %s", event_method)

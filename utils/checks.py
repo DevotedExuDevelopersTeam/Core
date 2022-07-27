@@ -1,11 +1,10 @@
 import disnake
 from disnake.ext.commands import Context, check
 
-from utils.bot import Bot
 from utils.errors import StaffOnly
 
 
-async def is_staff(bot: Bot, inter: disnake.ApplicationCommandInteraction) -> bool:
+async def is_staff(bot, inter: disnake.Interaction) -> bool:
     if bot.staff_role in inter.user.roles:
         return True
     raise StaffOnly()

@@ -1,6 +1,5 @@
 import inspect
 import sys
-from typing import Type
 
 import disnake
 from disnake.ext import commands

@@ -7,8 +7,9 @@ import disnake
 from disnake.ext import commands
 
 from utils.cog import Cog
-from utils.constants import GUILD_ID
+from utils.constants import APPLICATIONS_CHANNEL_ID, GUILD_ID
 from utils.enums import FetchMode
+from utils.views import ApplicationsView
 
 
 class AdminCommands(Cog):
@@ -84,3 +85,12 @@ asyncio.run_coroutine_threadsafe(asyncf(), asyncio.get_running_loop())"""
                 [(i,) for i in left_members],
             )
         await inter.send(f"Successfully marked **{len(left_members)} members** as left")
+
+    @commands.slash_command(name="setupappl", description="Setups applications")
+    async def setupappl(self, inter: disnake.ApplicationCommandInteraction):
+        channel = inter.guild.get_channel(APPLICATIONS_CHANNEL_ID)
+        await channel.send(
+            "__**Job Application**__\nPress the corresponding button to apply for a job",
+            view=ApplicationsView(),
+        )
+        await inter.send("Done", ephemeral=True)

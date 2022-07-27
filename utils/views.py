@@ -155,7 +155,10 @@ class ApplicationControlsView(disnake.ui.View):
         )
 
     @disnake.ui.button(
-        label="Unlock", style=disnake.ButtonStyle.blurple, custom_id="appl_unlock"
+        label="Unlock",
+        style=disnake.ButtonStyle.blurple,
+        custom_id="appl_unlock",
+        disabled=True,
     )
     async def unlock(
         self, button: disnake.ui.Button, inter: disnake.MessageInteraction
@@ -196,7 +199,7 @@ class ApplicationButton(disnake.ui.Button):
                 ephemeral=True,
             )
             return
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(with_message=True, ephemeral=True)
         channel = await category.create_text_channel(
             name=f"ja-{interaction.user}",
             overwrites={
@@ -217,3 +220,4 @@ class ApplicationButton(disnake.ui.Button):
             "If you didn't intend to open an application, press close button.",
             view=ApplicationControlsView(),
         )
+        await interaction.send(f"Please head to {channel.mention}", ephemeral=True)

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "Core"
 version = "1.0"
-description = ""
+description = "Personal bot of DevotedExu server"
 authors = ["Exenifix"]
 
 [tool.poetry.dependencies]

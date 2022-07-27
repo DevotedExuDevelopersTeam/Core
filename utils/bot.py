@@ -50,7 +50,6 @@ class Bot(commands.Bot):
         self.log.info("Running...")
         self.check_required_dirs()
         self.load_all_extensions("ext")
-        self.setup_persistent_views()
 
         token = os.getenv("TOKEN")
         assert token is not None, "No token was provided"
@@ -58,6 +57,7 @@ class Bot(commands.Bot):
 
     async def start(self, token: str, *, reconnect: bool = True):
         self.log.info("Starting...")
+        self.setup_persistent_views()
         await self.db.connect()
 
         await super().start(token, reconnect=reconnect)

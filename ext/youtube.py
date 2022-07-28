@@ -18,6 +18,7 @@ class YoutubeFetchers(Cog):
 
         self.queue: list[tuple[int, str]] = []  # list[tuple[discord_id, youtube_id]]
         self.youtube_fetcher.start()
+        self.youtube_poster.start()
 
     @Cog.listener("on_member_remove")
     async def youtuber_remover(self, member: disnake.Member):

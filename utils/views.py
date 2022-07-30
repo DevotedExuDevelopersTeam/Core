@@ -134,7 +134,7 @@ class ApplicationControlsView(disnake.ui.View):
         label="Done", style=disnake.ButtonStyle.green, custom_id="appl_done"
     )
     async def done(self, _, inter: disnake.MessageInteraction):
-        await inter.response.defer()
+        await inter.response.defer(with_message=True)
         await inter.channel.set_permissions(
             inter.user, send_messages=False, read_messages=True
         )
@@ -166,7 +166,7 @@ class ApplicationControlsView(disnake.ui.View):
         if not await is_staff(inter.bot, inter):
             await inter.send("Only staff can use this", ephemeral=True)
             return
-        await inter.response.defer()
+        await inter.response.defer(with_message=True, ephemeral=True)
         self.remove_item(button)
         await inter.message.edit(view=self)
         member = await inter.guild.getch_member(
@@ -174,6 +174,14 @@ class ApplicationControlsView(disnake.ui.View):
         )
         if member is None:
             await inter.send("Seems like this member has left the server")
+            return
+        await inter.channel.set_permissions(
+            member, send_messages=True, read_messages=True
+        )
+        await inter.send("Unlocked the channel", ephemeral=True)
+        await inter.channel.send(
+            f"{member.mention}, {inter.author.mention} has come to review your application!"
+        )
 
 
 class ApplicationButton(disnake.ui.Button):

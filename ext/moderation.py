@@ -178,6 +178,27 @@ class ModerationCommands(Cog):
             "Kick", user, inter.user, violated_rule=str(rule)
         )
 
+    @commands.slash_command(
+        name="temprole", description="Temporarily assigns a role to a user"
+    )
+    async def temprole(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: disnake.Member,
+        role: disnake.Role,
+        time: TimeConverter,
+    ):
+        if user.top_role >= inter.user.top_role:
+            raise HierarchyError()
+
+        await inter.response.defer()
+        await user.add_roles(role)
+        await self.bot.db.add_temprole(user.id, role.id, time)
+        await inter.send(
+            f"Successfully assigned {role.mention} to {user.mention} for **{timedelta_to_full_str(time)}**",
+            allowed_mentions=disnake.AllowedMentions.none(),
+        )
+
 
 class WarningsManagement(Cog):
     async def cog_slash_command_check(

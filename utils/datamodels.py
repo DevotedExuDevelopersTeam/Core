@@ -61,6 +61,10 @@ class Database:
         await self._pool.close()
         self.log.ok("Connection pool closed successfully")
 
+    @property
+    def pool(self):
+        return self._pool
+
     async def execute(
         self, query: str, *args, fetch_mode: FetchMode = FetchMode.NONE
     ) -> None | list[dict] | dict | Any:
@@ -303,10 +307,6 @@ FROM warns WHERE target_id = $1",
 
     async def remove_rule(self, id: str):
         await self.execute("DELETE FROM rules WHERE id = $1", id)
-
-    @property
-    def pool(self):
-        return self._pool
 
 
 class Cache:

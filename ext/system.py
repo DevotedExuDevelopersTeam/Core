@@ -7,6 +7,7 @@ from utils.bot import Bot
 from utils.cog import Cog
 from utils.enums import FetchMode
 from utils.errors import UNKNOWN, get_error_msg
+from utils.constants import MEMBERS_TRACKER_ID
 
 
 class SystemLoops(Cog):
@@ -15,6 +16,16 @@ class SystemLoops(Cog):
 
         self.temproles_and_locked_channels_remover.start()
         self.bans_remover.start()
+        self.warnings_remover.start()
+        self.stats_updater.start()
+
+    @tasks.loop(minutes=30)
+    async def stats_updater(self):
+        try:
+            members_tracker = self.bot.server.get_channel(MEMBERS_TRACKER_ID)
+            await members_tracker.edit(name=f"Members: {self.bot.server.member_count}")
+        except Exception as e:
+            self.bot.log.error("Failed to update trackers", exc_info=e)
 
     @tasks.loop(minutes=5)
     async def temproles_and_locked_channels_remover(self):

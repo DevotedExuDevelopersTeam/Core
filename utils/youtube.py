@@ -19,7 +19,10 @@ async def fetch_last_video(youtube_id: str) -> str:
             },
         )
         if r.status == 200:
-            data = await r.json()
-            return data["items"][0]["contentDetails"]["upload"]["videoId"]
+            try:
+                data = await r.json()
+                return data["items"][0]["contentDetails"]["upload"]["videoId"]
+            except KeyError:
+                raise YoutubeFetchFailure(youtube_id)
         else:
             raise YoutubeFetchFailure(youtube_id)

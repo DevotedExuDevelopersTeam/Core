@@ -21,6 +21,7 @@ class SystemLoops(Cog):
 
     @tasks.loop(minutes=30)
     async def stats_updater(self):
+        await self.bot.wait_until_ready()
         try:
             members_tracker = self.bot.server.get_channel(MEMBERS_TRACKER_ID)
             await members_tracker.edit(name=f"Members: {self.bot.server.member_count}")

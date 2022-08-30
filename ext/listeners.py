@@ -39,6 +39,8 @@ class MessageListeners(Cog):
 
     @Cog.listener("on_message_delete")
     async def deleted_messages_log(self, message: disnake.Message):
+        if message.author.bot:
+            return
         channel = self.bot.server.get_channel(DELETED_MESSAGES_LOG_CHANNEL_ID)
         if channel is None:
             self.bot.log.warning("Failed to get deleted messages log channel")

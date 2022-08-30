@@ -7,6 +7,7 @@ import asyncpg
 import disnake
 from exencolorlogs import Logger
 
+from utils.db_updater import update_db
 from utils.enums import FetchMode
 from utils.youtube import fetch_last_video
 
@@ -55,6 +56,8 @@ class Database:
         self.log.info("Creating connection pool...")
         self._pool = await asyncpg.create_pool(**self._connection_config)
         self.log.ok("Connection pool created successfully!")
+        await self.setup("base_config.sql")
+        await update_db(self)
 
     async def close(self):
         self.log.info("Closing connection pool...")

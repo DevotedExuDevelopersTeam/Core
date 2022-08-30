@@ -1,14 +1,12 @@
 import asyncpg
 from asyncpg.transaction import Transaction
 from exencolorlogs import Logger
-
-from utils.datamodels import Database
 from utils.enums import FetchMode
 
 VERSION = 1
 
 
-async def update_db(db: Database):
+async def update_db(db):
     log = Logger("DB_UPDATER")
     log.info("Checking database version incompatibilities...")
     _con: asyncpg.Connection = await db.pool.acquire()

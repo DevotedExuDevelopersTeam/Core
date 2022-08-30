@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS scores
 (
     id          BIGINT PRIMARY KEY,
     score_total INT DEFAULT 0,
+    score_daily INT DEFAULT 0,
     left_server BOOLEAN DEFAULT false
 );
 
@@ -80,4 +81,4 @@ CREATE TABLE IF NOT EXISTS version
     version INT
 );
 
-INSERT INTO version (id, version) VALUES (0, 0) ON CONFLICT DO NOTHING;
+INSERT INTO version (id, version) VALUES (0, 1) ON CONFLICT DO NOTHING;

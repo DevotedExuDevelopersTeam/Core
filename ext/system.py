@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 import disnake
 from disnake.ext import commands, tasks
@@ -7,7 +7,7 @@ from utils.bot import Bot
 from utils.cog import Cog
 from utils.enums import FetchMode
 from utils.errors import UNKNOWN, get_error_msg
-from utils.constants import MEMBERS_TRACKER_ID
+from utils.constants import MEMBERS_TRACKER_ID, DAILY_SCORE_TRACKER_ID
 
 
 class SystemLoops(Cog):
@@ -18,6 +18,7 @@ class SystemLoops(Cog):
         self.bans_remover.start()
         self.warnings_remover.start()
         self.stats_updater.start()
+        self.daily_reset.start()
 
     @tasks.loop(minutes=30)
     async def stats_updater(self):
@@ -27,6 +28,10 @@ class SystemLoops(Cog):
         try:
             members_tracker = self.bot.server.get_channel(MEMBERS_TRACKER_ID)
             await members_tracker.edit(name=f"Members: {self.bot.server.member_count}")
+            daily_score_tracker = self.bot.server.get_channel(DAILY_SCORE_TRACKER_ID)
+            await daily_score_tracker.edit(
+                name=f"Daily Score: {await self.bot.db.get_total_daily_score()}"
+            )
         except Exception as e:
             self.bot.log.error("Failed to update trackers", exc_info=e)
 
@@ -92,6 +97,11 @@ class SystemLoops(Cog):
             "DELETE FROM warns WHERE issued_at < $1",
             datetime.now() - timedelta(days=30),
         )
+
+    @tasks.loop(time=time(0))
+    async def daily_reset(self):
+        await self.bot.wait_until_ready()
+        await self.bot.db.reset_daily_score()
 
 
 class SystemListeners(Cog):

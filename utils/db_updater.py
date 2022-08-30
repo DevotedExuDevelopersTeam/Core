@@ -5,7 +5,7 @@ from exencolorlogs import Logger
 from utils.datamodels import Database
 from utils.enums import FetchMode
 
-VERSION = 0
+VERSION = 1
 
 
 async def update_db(db: Database):
@@ -22,8 +22,11 @@ async def update_db(db: Database):
             log.info("Executing compatibility script #%s", db_version)
             async with _con.transaction():
                 transaction: Transaction
-                pass
-                # here goes script execution
+                match db_version:
+                    case 1:
+                        await _con.execute(
+                            "ALTER TABLE scores ADD COLUMN score_daily INT DEFAULT 0"
+                        )
 
                 # noinspection SqlWithoutWhere
                 await _con.execute("UPDATE version SET version = $1", db_version)

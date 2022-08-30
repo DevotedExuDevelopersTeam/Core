@@ -191,7 +191,7 @@ class LevelsManagement(Cog):
         user: disnake.Member,
         score: int = commands.Param(ge=1, le=1_000_000),
     ):
-        await self.bot.db.update_users_score(user.id, score)
+        await self.bot.db.update_users_score(user.id, score, admin=True)
         await inter.send(
             f"Successfully added `{sep_num(score, ' ')}` score to {user.mention}"
         )
@@ -205,7 +205,7 @@ class LevelsManagement(Cog):
         user: disnake.Member,
         score: int = commands.Param(ge=1, le=1_000_000),
     ):
-        await self.bot.db.update_users_score(user.id, -score)
+        await self.bot.db.update_users_score(user.id, -score, admin=True)
         await inter.send(
             f"Successfully removed `{sep_num(score, ' ')}` score from {user.mention}"
         )

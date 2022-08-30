@@ -185,13 +185,28 @@ FROM warns WHERE target_id = $1",
             or 0
         )
 
-    async def update_users_score(self, user_id: int, delta: int):
+    async def reset_daily_score(self):
+        # noinspection SqlWithoutWhere
+        await self.execute("UPDATE scores SET score_daily = 0")
+
+    async def get_total_daily_score(self) -> int:
+        return await self.execute(
+            "SELECT SUM(score_daily) FROM scores", fetch_mode=FetchMode.VAL
+        )
+
+    async def update_users_score(self, user_id: int, delta: int, admin: bool = False):
         await self.execute(
             "INSERT INTO scores (id, score_total) VALUES ($1, $2) "
             "ON CONFLICT (id) DO UPDATE SET score_total = scores.score_total + $2, left_server = false",
             user_id,
             delta,
         )
+        if not admin and delta > 0:
+            await self.execute(
+                "UPDATE scores SET score_daily = score_daily + $1 WHERE id = $2",
+                delta,
+                user_id,
+            )
 
     async def get_lb_position(self, score: int) -> int:
         return await self.execute(

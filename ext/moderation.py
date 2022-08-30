@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
 
-from utils.autocomplete import rules_autocomplete
+from utils.autocomplete import rules_autocomplete, invalidate as invalidate_rules
 from utils.checks import is_staff
 from utils.cog import Cog
 from utils.constants import FILEMUTED_ROLE_ID
@@ -490,6 +490,7 @@ class RulesManagement(Cog):
             )
             return
         await self.bot.db.add_rule(id, contents)
+        invalidate_rules()
         await inter.send(f"Successfully added rule `{id}`")
 
     @commands.slash_command(name="removerule", description="Removes a rule")
@@ -499,4 +500,5 @@ class RulesManagement(Cog):
         rule: RuleConverter = RulesAutocomplete,
     ):
         await self.bot.db.remove_rule(rule.id)
+        invalidate_rules()
         await inter.send(f"Successfully removed rule `{rule.id}`")

@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Iterable
@@ -66,12 +65,3 @@ def s_(num: int):
     if not str(num).endswith("1"):
         return "s"
     return ""
-
-
-def contains_promocode(s: str) -> bool:
-    found_re = re.findall(r"\w{8}", s)
-    for word in found_re:
-        if re.search(r"\d+", word) is not None:
-            return True
-
-    return False

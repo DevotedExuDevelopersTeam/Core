@@ -12,7 +12,7 @@ from utils.constants import (
     HU_CHANNEL_ID,
     WELCOME_CHANNEL_ID,
 )
-from utils.utils import contains_promocode, ordinal_num
+from utils.utils import ordinal_num
 
 
 class MessageListeners(Cog):
@@ -76,15 +76,6 @@ class MessageListeners(Cog):
             await message.delete()
             await message.channel.send(
                 f"{message.author.mention} numbers only!", delete_after=3
-            )
-
-        elif contains_promocode(message.content):
-            await message.delete()
-            await message.channel.send(
-                f"{message.author.mention}, your message was deleted due to "
-                "suspect of containing promocode. Leaking promocodes is not "
-                "allowed here. If you believe this was a mistake, please contact "
-                "our staff."
             )
 
 

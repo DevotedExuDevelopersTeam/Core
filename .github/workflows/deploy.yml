@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish Release
-        uses: Exenifix/autotag@v1.1.2
+        uses: Exenifix/autotag@v1.1.3
 
   deploy:
     runs-on: self-hosted

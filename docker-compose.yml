@@ -13,3 +13,4 @@ services:
       - PASSWORD
       - USER=core
       - GOOGLE_API_KEY
+    restart: always

@@ -6,7 +6,7 @@ import disnake
 from disnake.ext.commands import Converter, converter_method
 
 from utils.autocomplete import get_rules
-from utils.errors import RuleNotFound
+from utils.errors import RuleNotFound, TimeConversionFailure
 
 
 class TimeConverter(Converter, timedelta):
@@ -23,7 +23,11 @@ class TimeConverter(Converter, timedelta):
             except (AttributeError, ValueError):
                 pass
 
-        return timedelta(**values)
+        delta = timedelta(**values)
+        if delta.total_seconds() == 0:
+            raise TimeConversionFailure(argument)
+
+        return delta
 
 
 @dataclass

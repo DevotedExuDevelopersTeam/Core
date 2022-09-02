@@ -67,7 +67,10 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
     ):
         path = f"backgrounds/{inter.author.id}.png"
         if bg is None:
-            os.remove(path)
+            try:
+                os.remove(path)
+            except FileNotFoundError:
+                pass
             await inter.send("Successfully reset your background")
         await inter.response.defer()
         # noinspection PyTypeChecker

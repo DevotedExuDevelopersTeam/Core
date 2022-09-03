@@ -9,6 +9,7 @@ from utils.autocomplete import rules_autocomplete
 from utils.checks import staff_only
 from utils.cog import Cog
 from utils.converters import RuleConverter
+from utils.embeds import SuccessEmbed
 from utils.image_generator import resize_bg
 from utils.utils import datetime_to_timestamp, timedelta_to_full_str
 from utils.views import ConfirmationView
@@ -71,12 +72,17 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
                 os.remove(path)
             except FileNotFoundError:
                 pass
-            await inter.send("Successfully reset your background")
+            await inter.send(
+                embed=SuccessEmbed(inter.user, "Successfully reset your background")
+            )
+            return
         await inter.response.defer()
         # noinspection PyTypeChecker
         await bg.save(path)
         await resize_bg(path)
-        await inter.send("Successfully set your background")
+        await inter.send(
+            embed=SuccessEmbed(inter.user, "Successfully set your background")
+        )
 
     @commands.slash_command(name="afk", description="Sets an AFK")
     async def afk(self, inter: disnake.ApplicationCommandInteraction, text: str):
@@ -90,7 +96,7 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         rule: RuleConverter = commands.Param(autocomplete=rules_autocomplete),
     ):
         await inter.send(
-            embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=str(rule))
+            embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=rule.content)
         )
 
     @commands.slash_command(
@@ -102,7 +108,7 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         except Exception as e:
             await inter.send(f"Failed to evaluate this expression: `{e}`")
             return
-        await inter.send(f"Result: `{result}`")
+        await inter.send(embed=SuccessEmbed(inter.user, f"Result: `{result}`"))
 
     @commands.slash_command(name="dm", description="DMs member a message")
     @staff_only()
@@ -126,6 +132,10 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
                         description=text,
                     )
                 )
-                await inter.send(f"Successfully sent DM to {user.mention}")
+                await inter.send(
+                    embed=SuccessEmbed(
+                        inter.user, f"Successfully sent DM to {user.mention}"
+                    )
+                )
             except disnake.HTTPException:
                 await inter.send("Their DMs are closed for bot")

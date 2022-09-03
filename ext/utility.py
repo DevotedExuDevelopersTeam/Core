@@ -5,6 +5,7 @@ from disnake.ext import commands
 
 from utils.checks import staff_only
 from utils.cog import Cog
+from utils.embeds import SuccessEmbed
 
 
 class ButtonRoles(Cog):
@@ -69,7 +70,7 @@ class ButtonRoles(Cog):
         view.add_item(disnake.ui.Button(custom_id=id, label=button_name))
         await message.edit(view=view)
         await self.bot.db.add_button_role(id, role.id, message_id)
-        await inter.send("Added a new button role")
+        await inter.send(embed=SuccessEmbed(inter.user, "Added a new button role"))
 
     @commands.slash_command(
         name="removebuttonrole", description="Removes a button role"
@@ -96,7 +97,11 @@ class ButtonRoles(Cog):
                 view.remove_item(component)
                 await message.edit(view=view)
                 await self.bot.db.remove_button_role(component.custom_id)
-                await inter.send("Successfully removed button role from that message")
+                await inter.send(
+                    embed=SuccessEmbed(
+                        inter.user, "Successfully removed button role from that message"
+                    )
+                )
                 return
 
         await inter.send(

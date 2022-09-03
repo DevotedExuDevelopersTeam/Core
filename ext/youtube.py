@@ -8,6 +8,7 @@ from utils.constants import (
     NEW_VIDEOS_ROLE_ID,
     YOUTUBE_CHANNEL_ID,
 )
+from utils.embeds import SuccessEmbed
 from utils.errors import YoutubeFetchFailure
 from utils.youtube import fetch_last_video
 
@@ -92,7 +93,10 @@ class YoutubeManagement(Cog):
     ):
         await self.bot.db.add_youtuber(user.id, youtube_id, premium)
         await inter.send(
-            f"Successfully added {user.mention} to content creators program"
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully added {user.mention} to content creators program",
+            )
         )
 
     @commands.slash_command(name="removeyt", description="Removes a youtuber")
@@ -102,7 +106,10 @@ class YoutubeManagement(Cog):
         is_youtuber = await self.bot.db.remove_youtuber(user.id)
         if is_youtuber:
             await inter.send(
-                f"Successfully removed {user.mention} from content creators program"
+                embed=SuccessEmbed(
+                    inter.user,
+                    f"Successfully removed {user.mention} from content creators program",
+                )
             )
         else:
             await inter.send("This user is not a youtuber", ephemeral=True)

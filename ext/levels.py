@@ -8,6 +8,7 @@ from tabulate import tabulate
 from utils.bot import Bot
 from utils.cog import Cog
 from utils.constants import XP_BOUNDS, XP_COOLDOWN_SECONDS, XP_IGNORED_CHANNELS_IDS
+from utils.embeds import SuccessEmbed
 from utils.errors import AdminOnly
 from utils.image_generator import draw_leaderboard, draw_rank_card
 from utils.utils import get_next_score, sep_num
@@ -150,8 +151,10 @@ class LevelsManagement(Cog):
     ):
         await self.bot.db.add_level(role.id, required_score)
         await inter.send(
-            f"Successfully added level with role {role.mention} and score `{sep_num(required_score, '.')}`",
-            allowed_mentions=disnake.AllowedMentions.none(),
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully added level with role {role.mention} and score `{sep_num(required_score, '.')}`",
+            )
         )
 
     @commands.slash_command(name="removelevel", description="Removes a level")
@@ -167,8 +170,10 @@ class LevelsManagement(Cog):
             await inter.send("This role is not assigned as level role", ephemeral=True)
             return
         await inter.send(
-            f"Successfully removed level with role {role.mention} and score `{sep_num(required_score, '.')}`",
-            allowed_mentions=disnake.AllowedMentions.none(),
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully removed level with role {role.mention} and score `{sep_num(required_score, '.')}`",
+            )
         )
 
     @removelevel.sub_command(name="score", description="Removes a level by score")
@@ -180,8 +185,10 @@ class LevelsManagement(Cog):
             await inter.send("There's no role assigned to this score", ephemeral=True)
             return
         await inter.send(
-            f"Successfully removed level with role <@&{role_id}> and score `{sep_num(required_score, '.')}`",
-            allowed_mentions=disnake.AllowedMentions.none(),
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully removed level with role <@&{role_id}> and score `{sep_num(required_score, '.')}`",
+            )
         )
 
     @commands.slash_command(name="addscore", description="Adds score to a member")
@@ -193,7 +200,10 @@ class LevelsManagement(Cog):
     ):
         await self.bot.db.update_users_score(user.id, score, admin=True)
         await inter.send(
-            f"Successfully added `{sep_num(score, ' ')}` score to {user.mention}"
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully added `{sep_num(score, ' ')}` score to {user.mention}",
+            )
         )
 
     @commands.slash_command(
@@ -207,5 +217,8 @@ class LevelsManagement(Cog):
     ):
         await self.bot.db.update_users_score(user.id, -score, admin=True)
         await inter.send(
-            f"Successfully removed `{sep_num(score, ' ')}` score from {user.mention}"
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully removed `{sep_num(score, ' ')}` score from {user.mention}",
+            )
         )

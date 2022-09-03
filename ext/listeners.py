@@ -12,6 +12,7 @@ from utils.constants import (
     HU_CHANNEL_ID,
     WELCOME_CHANNEL_ID,
 )
+from utils.embeds import ErrorEmbed
 from utils.utils import ordinal_num
 
 
@@ -33,7 +34,10 @@ class MessageListeners(Cog):
         if self.filemuted_role in message.author.roles and len(message.attachments) > 0:
             await message.delete()
             await message.channel.send(
-                f"{message.author.mention}, you cannot send attachments when filemuted!",
+                embed=ErrorEmbed(
+                    message.author,
+                    f"{message.author.mention}, you cannot send attachments when filemuted!",
+                ),
                 delete_after=3,
             )
 

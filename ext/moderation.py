@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import disnake
 from disnake.ext import commands
 
@@ -6,6 +8,7 @@ from utils.checks import is_staff
 from utils.cog import Cog
 from utils.constants import FILEMUTED_ROLE_ID
 from utils.converters import RuleConverter, TimeConverter
+from utils.embeds import BaseEmbed, ErrorEmbed, SuccessEmbed
 from utils.enums import FetchMode
 from utils.errors import HierarchyError
 from utils.utils import datetime_to_timestamp, s_, timedelta_to_full_str
@@ -33,7 +36,13 @@ class ModerationCommands(Cog):
         await user.timeout(duration=time, reason=f"Mod: {inter.user} | Rule: {rule.id}")
 
         await inter.send(
-            f"{user.mention} was timed out for `{timedelta_to_full_str(time)}`. Violated rule: `{rule}`"
+            embed=BaseEmbed(
+                user,
+                color=0xFFFF00,
+                title="⏰ Timeout",
+                description=f"{user.mention} was timed out for `{timedelta_to_full_str(time)}`.",
+                timestamp=datetime.now(),
+            ).add_field("Violated rule", str(rule), inline=False)
         )
         await self.bot.dis_log.log_target_action(
             "Mute", user, inter.user, time, str(rule)
@@ -50,7 +59,11 @@ class ModerationCommands(Cog):
 
         await user.timeout(duration=None, reason=f"Mod: {inter.user}")
 
-        await inter.send(f"Successfully removed timeout from {user.mention}")
+        await inter.send(
+            embed=SuccessEmbed(
+                inter.user, f"Successfully removed timeout from {user.mention}"
+            )
+        )
         await self.bot.dis_log.log_target_action(
             "Unmute", user, inter.user, color=0x00FF00
         )
@@ -79,7 +92,13 @@ class ModerationCommands(Cog):
         await self.bot.db.add_temprole(user.id, filemuted_role.id, time)
 
         await inter.send(
-            f"{user.mention} was filemuted for `{timedelta_to_full_str(time)}`."
+            embed=BaseEmbed(
+                user,
+                color=0xFFFF00,
+                title="📁 Filemuted",
+                description=f"{user.mention} was filemuted for `{timedelta_to_full_str(time)}`.",
+                timestamp=datetime.now(),
+            )
         )
         await self.bot.dis_log.log_target_action("Filemute", user, inter.user)
 
@@ -102,7 +121,9 @@ class ModerationCommands(Cog):
 
         await user.remove_roles(filemuted_role)
 
-        await inter.send(f"Took off the filemute from {user.mention}")
+        await inter.send(
+            embed=SuccessEmbed(inter.user, f"Took off the filemute from {user.mention}")
+        )
         await self.bot.dis_log.log_target_action("Unfilemute", user, inter.user)
 
     @commands.slash_command(name="ban", description="Bans a user")
@@ -118,8 +139,11 @@ class ModerationCommands(Cog):
         if user.top_role >= inter.user.top_role:
             raise HierarchyError()
 
+        await inter.response.defer()
         time_str = (
-            "for " + timedelta_to_full_str(time) if time is not None else "permanently"
+            ("for " + timedelta_to_full_str(time))
+            if time is not None
+            else "permanently"
         )
         try:
             await user.send(
@@ -133,7 +157,10 @@ class ModerationCommands(Cog):
             reason=f"Mod: {inter.user} | Duration: {time} | Rule: {rule.id}",
         )
         await inter.send(
-            f"**{user}** was banned {time_str} for breaking rule `{rule.id}`"
+            embed=SuccessEmbed(
+                inter.user,
+                f"**{user}** was banned {time_str} for breaking rule `{rule.id}`",
+            )
         )
         await self.bot.dis_log.log_target_action(
             "Ban", user, inter.user, time, str(rule), color=0xFF0000
@@ -150,7 +177,9 @@ class ModerationCommands(Cog):
             await inter.guild.unban(
                 disnake.Object(user_id), reason=f"Mod: {inter.user}"
             )
-            await inter.send(f"Successfully unbanned `{user_id}`")
+            await inter.send(
+                embed=SuccessEmbed(inter.user, f"Successfully unbanned `{user_id}`")
+            )
         except disnake.HTTPException:
             await inter.send("Failed to unban that user", ephemeral=True)
 
@@ -173,7 +202,11 @@ class ModerationCommands(Cog):
             pass
 
         await user.kick(reason=f"Mod: {inter.user}")
-        await inter.send(f"**{user}** was kicked for breaking rule `{rule.id}`")
+        await inter.send(
+            embed=SuccessEmbed(
+                inter.user, f"**{user}** was kicked for breaking rule `{rule.id}`"
+            )
+        )
         await self.bot.dis_log.log_target_action(
             "Kick", user, inter.user, violated_rule=str(rule)
         )
@@ -195,8 +228,10 @@ class ModerationCommands(Cog):
         await user.add_roles(role)
         await self.bot.db.add_temprole(user.id, role.id, time)
         await inter.send(
-            f"Successfully assigned {role.mention} to {user.mention} for **{timedelta_to_full_str(time)}**",
-            allowed_mentions=disnake.AllowedMentions.none(),
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully assigned {role.mention} to {user.mention} for **{timedelta_to_full_str(time)}**",
+            )
         )
 
 
@@ -228,9 +263,19 @@ class WarningsManagement(Cog):
             rule.id,
             fetch_mode=FetchMode.VAL,
         )
+
         await inter.send(
-            f"Successfully assigned warning to {user.mention}. Violated rule: `{rule}`\n\
-This user now has `{total_warns}` warnings totally and `{warns_for_rule}` warnings for rule `{rule.id}`."
+            embed=BaseEmbed(
+                user,
+                color=0xFFFF00,
+                title="⚠️ Warning",
+                description=f"{user.mention} was warned.",
+            )
+            .add_field("Violated rule", str(rule), inline=False)
+            .add_field(
+                "Warnings now",
+                f"**Total:** `{total_warns}`\n**For rule `{rule.id}`:** `{warns_for_rule}`",
+            )
         )
         await self.bot.dis_log.log_target_action(
             "Warn", user, inter.user, violated_rule=str(rule)
@@ -267,11 +312,15 @@ Violated rule: `{warning.rule_violated}`",
 
     @commands.slash_command(name="delwarn", description="Deletes a single warning")
     async def delwarn(self, inter: disnake.ApplicationCommandInteraction, id: int):
-        success = await self.bot.db.delete_warn(id)
-        if success:
-            await inter.send(f"Successfully deleted warning `#{id}`")
+        if await self.bot.db.delete_warn(id):
+            await inter.send(
+                embed=SuccessEmbed(inter.user, f"Successfully deleted warning `#{id}`")
+            )
         else:
-            await inter.send(f"Warning `#{id}` does not exist", ephemeral=True)
+            await inter.send(
+                embed=ErrorEmbed(inter.user, f"Warning `#{id}` does not exist"),
+                ephemeral=True,
+            )
 
     @commands.slash_command(
         name="delwarns", description="Deletes all warnings from the user"
@@ -282,7 +331,10 @@ Violated rule: `{warning.rule_violated}`",
         count = await self.bot.db.clear_warns(user.id)
         if count > 0:
             await inter.send(
-                f"Successfully removed **{count}** warning{s_(count)} from {user.mention}"
+                embed=SuccessEmbed(
+                    inter.user,
+                    f"Successfully removed **{count}** warning{s_(count)} from {user.mention}",
+                )
             )
         else:
             await inter.send("That user has no warnings to clear", ephemeral=True)
@@ -309,7 +361,10 @@ class ChannelsModeration(Cog):
         user_perms = channel.permissions_for(inter.user)
         if not user_perms.send_messages or not user_perms.read_messages:
             await inter.send(
-                "You do not have right to lock that channel", ephemeral=True
+                embed=ErrorEmbed(
+                    inter.user, "You do not have right to lock that channel"
+                ),
+                ephemeral=True,
             )
             return
         if channel.permissions_for(inter.guild.default_role).send_messages is False:
@@ -327,7 +382,10 @@ class ChannelsModeration(Cog):
             await self.bot.db.add_locked_channel(channel.id, time)
 
         await inter.send(
-            f"Locked channel {channel.mention}{' for ' + timedelta_to_full_str(time) if time is not None else ''}"
+            embed=SuccessEmbed(
+                inter.user,
+                f"Locked channel {channel.mention}{' for ' + timedelta_to_full_str(time) if time is not None else ''}",
+            )
         )
         await self.bot.dis_log.log_target_action(
             "Channel Lock", channel, inter.user, time, color=0xFF0000
@@ -343,7 +401,10 @@ class ChannelsModeration(Cog):
         user_perms = channel.permissions_for(inter.user)
         if not user_perms.send_messages or not user_perms.read_messages:
             await inter.send(
-                "You do not have right to lock that channel", ephemeral=True
+                embed=ErrorEmbed(
+                    inter.user, "You do not have right to lock that channel"
+                ),
+                ephemeral=True,
             )
             return
         if channel.permissions_for(inter.guild.default_role).send_messages is not False:
@@ -358,7 +419,9 @@ class ChannelsModeration(Cog):
             reason=f"Mod: {inter.user}",
         )
         await self.bot.db.remove_locked_channel(channel.id)
-        await inter.send(f"Unlocked channel {channel.mention}")
+        await inter.send(
+            embed=SuccessEmbed(inter.user, f"Unlocked channel {channel.mention}")
+        )
         await self.bot.dis_log.log_target_action(
             "Channel Unlock", channel, inter.user, color=0x00FF00
         )
@@ -367,21 +430,29 @@ class ChannelsModeration(Cog):
     async def slowmode(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        slowmode: TimeConverter = 0,
+        slowmode: TimeConverter = None,
         channel: disnake.TextChannel = None,
     ):
         channel = channel or inter.channel
         user_perms = channel.permissions_for(inter.user)
         if not user_perms.send_messages or not user_perms.read_messages:
             await inter.send(
-                "You do not have right to change slowmode in that channel",
+                embed=ErrorEmbed(
+                    inter.user,
+                    "You do not have right to change slowmode in that channel",
+                ),
                 ephemeral=True,
             )
             return
 
-        await channel.edit(slowmode_delay=slowmode.seconds)
+        await channel.edit(
+            slowmode_delay=slowmode.seconds if slowmode is not None else 0
+        )
         await inter.send(
-            f"Successfully set the slowmode in {channel.mention} to **{timedelta_to_full_str(slowmode)}**"
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully set the slowmode in {channel.mention} to **{timedelta_to_full_str(slowmode)}**",
+            )
         )
 
     @commands.slash_command(name="purge", description="Purges messages in a channel")
@@ -396,7 +467,10 @@ class ChannelsModeration(Cog):
         user_perms = channel.permissions_for(inter.user)
         if not user_perms.send_messages or not user_perms.read_messages:
             await inter.send(
-                "You do not have right to purge that channel", ephemeral=True
+                embed=ErrorEmbed(
+                    inter.user, "You do not have right to purge that channel"
+                ),
+                ephemeral=True,
             )
             return
 
@@ -408,7 +482,10 @@ class ChannelsModeration(Cog):
 
         purged = len(await channel.purge(limit=amount, check=check))
         await inter.send(
-            f"Successfully purged **{purged}** messages in {channel.mention}",
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully purged **{purged}** messages in {channel.mention}",
+            ),
             ephemeral=True,
         )
 
@@ -423,6 +500,7 @@ class ChannelsModeration(Cog):
         message = await inter.channel.fetch_message(message_id)
         if message is None:
             await inter.send("Could not find a message with that ID", ephemeral=True)
+            return
         await inter.response.defer(ephemeral=True)
         purged = len(
             await inter.channel.purge(
@@ -430,7 +508,10 @@ class ChannelsModeration(Cog):
             )
         )
         await inter.send(
-            f"Successfully purged **{purged}** messages in {inter.channel.mention}",
+            embed=SuccessEmbed(
+                inter.user,
+                f"Successfully purged **{purged}** messages in {inter.channel.mention}",
+            ),
             ephemeral=True,
         )
 
@@ -452,7 +533,7 @@ class ChannelsModeration(Cog):
                 reason=f"Server lock done by {inter.user}",
             )
         await inter.send(
-            "Successfully locked the server. Please do not restart bot until server is unlocked"
+            embed=SuccessEmbed(inter.user, "Successfully locked the server")
         )
 
     @commands.slash_command(name="unlockserver", description="Unlocks the server")
@@ -467,7 +548,7 @@ class ChannelsModeration(Cog):
                 overwrite=overwrite,
                 reason=f"Server unlock done by {inter.user}",
             )
-        await inter.send("Unlocked the server")
+        await inter.send(embed=SuccessEmbed(inter.user, "Unlocked the server"))
         self.locked_channels.clear()
 
 
@@ -491,7 +572,9 @@ class RulesManagement(Cog):
             return
         await self.bot.db.add_rule(id, contents)
         invalidate_rules()
-        await inter.send(f"Successfully added rule `{id}`")
+        await inter.send(
+            embed=SuccessEmbed(inter.user, f"Successfully added rule `{id}`")
+        )
 
     @commands.slash_command(name="removerule", description="Removes a rule")
     async def removerule(
@@ -501,4 +584,6 @@ class RulesManagement(Cog):
     ):
         await self.bot.db.remove_rule(rule.id)
         invalidate_rules()
-        await inter.send(f"Successfully removed rule `{rule.id}`")
+        await inter.send(
+            embed=SuccessEmbed(inter.user, f"Successfully removed rule `{rule.id}`")
+        )

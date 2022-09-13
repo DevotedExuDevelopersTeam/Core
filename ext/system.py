@@ -86,7 +86,7 @@ class SystemLoops(Cog):
             try:
                 await self.bot.server.unban(disnake.Object(r["id"]))
             except disnake.HTTPException:
-                await self.bot.log.warning("Failed to unban %s", r["id"])
+                self.bot.log.warning("Failed to unban %s", r["id"])
 
         await self.bot.db.execute("DELETE FROM bans WHERE unban_at < $1", now)
 

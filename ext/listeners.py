@@ -104,3 +104,7 @@ They are our **{ordinal_num(member.guild.member_count)}** member!"
             return
 
         await channel.send(f"{member} just left.")
+
+    @Cog.listener()
+    async def on_member_unban(self, _, user: disnake.User):
+        await self.bot.db.remove_bans(user.id)

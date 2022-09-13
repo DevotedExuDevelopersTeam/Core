@@ -156,6 +156,8 @@ class ModerationCommands(Cog):
             delete_message_days=delete_message_days,
             reason=f"Mod: {inter.user} | Duration: {time} | Rule: {rule.id}",
         )
+        if time is not None:
+            await self.bot.db.add_tempban(user.id, datetime.now() + time)
         await inter.send(
             embed=SuccessEmbed(
                 inter.user,

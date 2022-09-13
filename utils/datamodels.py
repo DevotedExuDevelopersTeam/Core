@@ -326,6 +326,14 @@ FROM warns WHERE target_id = $1",
     async def remove_rule(self, id: str):
         await self.execute("DELETE FROM rules WHERE id = $1", id)
 
+    async def add_tempban(self, id: int, unban_at: datetime):
+        await self.execute(
+            "INSERT INTO bans (id, unban_at) VALUES ($1, $2)", id, unban_at
+        )
+
+    async def remove_bans(self, id: int):
+        await self.execute("DELETE FROM bans WHERE id = $1", id)
+
 
 class Cache:
     level_roles: dict[int, int]

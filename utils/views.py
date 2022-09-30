@@ -203,7 +203,7 @@ class ApplicationButton(disnake.ui.Button):
         if category is None:
             await interaction.send(
                 "Sorry, I was unable to find the system category. "
-                "Please contact administrators about this",
+                "Please contact administrators about this.",
                 ephemeral=True,
             )
             return
@@ -223,6 +223,7 @@ class ApplicationButton(disnake.ui.Button):
             },
         )
         await channel.send(
+            f"__**{self.label} Application**__\n"
             f"{interaction.user.mention} please fill out this form and press "
             f"the green button below when you are done: {link}.\n\n"
             "If you didn't intend to open an application, press close button.",

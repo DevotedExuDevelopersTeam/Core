@@ -6,7 +6,7 @@ authors = ["Exenifix"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-disnake = "^2.5.2"
+disnake = "^2.6.0"
 exencolorlogs = "^1.0.2"
 asyncpg = "^0.26.0"
 Pillow = "^9.2.0"

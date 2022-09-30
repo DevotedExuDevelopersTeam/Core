@@ -77,6 +77,8 @@ class ConfirmationView(BaseView):
 
 
 class ApplicationsView(disnake.ui.View):
+    applicants: list[int] = []
+
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -129,6 +131,10 @@ class ApplicationControlsView(disnake.ui.View):
     async def close(self, _, inter: disnake.MessageInteraction):
         await inter.send("Closing...", ephemeral=True)
         await inter.channel.delete()
+        try:
+            ApplicationsView.applicants.remove(inter.author.id)
+        except KeyError:
+            pass
 
     @disnake.ui.button(
         label="Done", style=disnake.ButtonStyle.green, custom_id="appl_done"
@@ -194,6 +200,12 @@ class ApplicationButton(disnake.ui.Button):
         self.pred = pred
 
     async def callback(self, interaction: disnake.MessageInteraction, /):
+        if interaction.author.id in ApplicationsView.applicants:
+            await interaction.send(
+                "You already have an application opened, please close your current one first.",
+                ephemeral=True,
+            )
+            return
         if self.pred is not None and not await self.pred(interaction):
             return
         link = APPLICATIONS_LINKS[self.custom_id]

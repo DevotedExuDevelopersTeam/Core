@@ -19,6 +19,9 @@ class Levels(Cog):
         super().__init__(bot)
         self.cooldowns: dict[int, datetime] = {}
 
+        # keys are channel IDs and values are ID of last member that sent the message
+        self.last_messages: dict[int, int] = {}
+
         self.cooldowns_cleaner.start()
 
     def _is_member_on_cooldown(self, member_id: int) -> bool:
@@ -48,6 +51,11 @@ class Levels(Cog):
         if len(roles_to_remove) > 0:
             await member.remove_roles(*[disnake.Object(i) for i in roles_to_remove])
 
+    def _is_last_member(self, msg: disnake.Message) -> bool:
+        is_last = self.last_messages.get(msg.channel.id, None) == msg.author.id
+        self.last_messages[msg.channel.id] = msg.author.id
+        return is_last
+
     @tasks.loop(minutes=10)
     async def cooldowns_cleaner(self):
         now = datetime.now()
@@ -62,6 +70,7 @@ class Levels(Cog):
             or message.author.bot
             or message.channel.id in XP_IGNORED_CHANNELS_IDS
             or message.channel.category_id in XP_IGNORED_CHANNELS_IDS
+            or self._is_last_member(message)
             or self._is_member_on_cooldown(message.author.id)
         ):
             return

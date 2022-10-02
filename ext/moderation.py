@@ -134,7 +134,6 @@ class ModerationCommands(Cog):
         user: disnake.Member,
         rule: RuleConverter = RulesAutocomplete,
         time: TimeConverter = None,
-        delete_message_days: int = commands.Param(0, ge=0, le=7),
     ):
         if user.top_role >= inter.user.top_role:
             raise HierarchyError()
@@ -153,7 +152,6 @@ class ModerationCommands(Cog):
             pass
 
         await user.ban(
-            delete_message_days=delete_message_days,
             reason=f"Mod: {inter.user} | Duration: {time} | Rule: {rule.id}",
         )
         if time is not None:

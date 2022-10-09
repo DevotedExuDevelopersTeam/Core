@@ -134,6 +134,7 @@ class ModerationCommands(Cog):
         user: disnake.Member,
         rule: RuleConverter = RulesAutocomplete,
         time: TimeConverter = None,
+        clean_history_duration: TimeConverter = 86400,
     ):
         if user.top_role >= inter.user.top_role:
             raise HierarchyError()
@@ -153,6 +154,7 @@ class ModerationCommands(Cog):
 
         await user.ban(
             reason=f"Mod: {inter.user} | Duration: {time} | Rule: {rule.id}",
+            clean_history_duration=clean_history_duration,
         )
         if time is not None:
             await self.bot.db.add_tempban(user.id, datetime.now() + time)

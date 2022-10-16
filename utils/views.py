@@ -1,4 +1,3 @@
-import re
 from typing import Awaitable, Callable, Generic, TypeVar
 
 import disnake
@@ -12,9 +11,6 @@ from utils.constants import (
 )
 
 T = TypeVar("T")
-
-
-MENTION_PATTERN = re.compile(r"<@!?\d{18,19}>")
 
 
 class Button(disnake.ui.Button, Generic[T]):

@@ -231,4 +231,5 @@ class ApplicationButton(disnake.ui.Button):
             "If you didn't intend to open an application, press close button.",
             view=ApplicationControlsView(),
         )
+        ApplicationsView.applicants.append(interaction.author.id)
         await interaction.send(f"Please head to {channel.mention}", ephemeral=True)

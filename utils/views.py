@@ -121,10 +121,6 @@ class ApplicationControlsView(disnake.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @staticmethod
-    def _extract_member(m: str) -> int:
-        return int(re.match(MENTION_PATTERN, m).group().strip("<@!>"))
-
     @disnake.ui.button(
         label="Close", style=disnake.ButtonStyle.red, custom_id="appl_close"
     )
@@ -133,7 +129,7 @@ class ApplicationControlsView(disnake.ui.View):
         await inter.channel.delete()
         try:
             ApplicationsView.applicants.remove(inter.author.id)
-        except KeyError:
+        except ValueError:
             pass
 
     @disnake.ui.button(
@@ -175,10 +171,8 @@ class ApplicationControlsView(disnake.ui.View):
         await inter.response.defer(with_message=True, ephemeral=True)
         self.remove_item(button)
         await inter.message.edit(view=self)
-        member = await inter.guild.getch_member(
-            self._extract_member(inter.message.content)
-        )
-        if member is None:
+        member = inter.message.mentions[0]
+        if member is None or isinstance(member, disnake.User):
             await inter.send("Seems like this member has left the server")
             return
         await inter.channel.set_permissions(

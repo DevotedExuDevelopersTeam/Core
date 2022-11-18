@@ -5,7 +5,7 @@ description = "Personal bot of DevotedExu server"
 authors = ["Exenifix"]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.10,<3.12"
 exencolorlogs = "^1.0.2"
 asyncpg = "^0.27.0"
 Pillow = "^9.3.0"

@@ -230,7 +230,7 @@ class PromocodeView(disnake.ui.View):
     )
     async def get_promocode(self, _, inter: disnake.MessageInteraction):
         data = await self.bot.db.execute(
-            "SELECT code, unlocks_at, MIN(expires_at) FROM promocodes WHERE expires_at > CURRENT_DATE GROUP BY code",
+            "SELECT code, unlocks_at, MIN(expires_at) FROM promocodes WHERE expires_at >= CURRENT_DATE GROUP BY code",
             fetch_mode=FetchMode.ROW,
         )
         if data is None:

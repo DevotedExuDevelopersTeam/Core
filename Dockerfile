@@ -1,12 +1,16 @@
 FROM python:3.11-bullseye
 
-RUN pip install --no-cache-dir -U poetry==1.2.2
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VIRTUALENVS_CREATE=0 \
+    POETRY_VERSION=1.3.2
+
+RUN pip install "poetry==$POETRY_VERSION"
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
-RUN poetry install --no-dev
+
+RUN poetry install --only main
 
 COPY . .
-
-ENTRYPOINT ["poetry", "run", "python"]
-CMD ["main.py"]
+CMD ["poetry", "run", "python3", "main.py"]

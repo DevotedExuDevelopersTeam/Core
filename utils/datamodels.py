@@ -75,7 +75,7 @@ class Database:
             self.log.warning("Selection with no output. Query: %s", query)
         async with self._pool.acquire() as con:
             con: asyncpg.Connection
-            match fetch_mode:
+            match fetch_mode:  # noqa: E999
                 case FetchMode.NONE:
                     return await con.execute(query, *args)
                 case FetchMode.VAL:
@@ -96,9 +96,7 @@ class Database:
                     await con.execute(sql)
 
     async def get_member_afk(self, id: int) -> tuple[str, datetime] | tuple[None, None]:
-        r = await self.execute(
-            "SELECT afk, set_at FROM afks WHERE id = $1", id, fetch_mode=FetchMode.ROW
-        )
+        r = await self.execute("SELECT afk, set_at FROM afks WHERE id = $1", id, fetch_mode=FetchMode.ROW)
         if r is None:
             return None, None
         return r["afk"], r["set_at"]
@@ -198,9 +196,7 @@ FROM warns WHERE target_id = $1",
         await self.execute("TRUNCATE promo_notifications")
 
     async def get_total_daily_score(self) -> int:
-        return await self.execute(
-            "SELECT SUM(score_daily) FROM scores", fetch_mode=FetchMode.VAL
-        )
+        return await self.execute("SELECT SUM(score_daily) FROM scores", fetch_mode=FetchMode.VAL)
 
     async def update_users_score(self, user_id: int, delta: int, admin: bool = False):
         await self.execute(
@@ -246,9 +242,7 @@ FROM warns WHERE target_id = $1",
     async def remove_level(self, score: int):
         ...
 
-    async def remove_level(
-        self, value: disnake.Role | int
-    ) -> tuple[int, int] | tuple[None, None]:
+    async def remove_level(self, value: disnake.Role | int) -> tuple[int, int] | tuple[None, None]:
         """role_id, required_score = await remove_level(...)"""
         if isinstance(value, disnake.Role):
             r = await self.execute(
@@ -280,9 +274,7 @@ FROM warns WHERE target_id = $1",
         ]
 
     async def set_youtuber_last_video(self, id: int, last_video: str):
-        await self.execute(
-            "UPDATE youtubers SET last_video = $1 WHERE id = $2", last_video, id
-        )
+        await self.execute("UPDATE youtubers SET last_video = $1 WHERE id = $2", last_video, id)
 
     async def add_youtuber(self, id: int, youtube_id: str, premium: bool):
         last_video = await fetch_last_video(youtube_id)
@@ -304,9 +296,7 @@ FROM warns WHERE target_id = $1",
     async def get_button_roles(self) -> dict[str, int]:
         return {
             r["id"]: r["role_id"]
-            for r in await self.execute(
-                "SELECT id, role_id FROM button_roles", fetch_mode=FetchMode.ALL
-            )
+            for r in await self.execute("SELECT id, role_id FROM button_roles", fetch_mode=FetchMode.ALL)
         }
 
     async def add_button_role(self, id: str, role_id: int, message_id: int):
@@ -324,17 +314,13 @@ FROM warns WHERE target_id = $1",
         await self.execute("DELETE FROM button_roles WHERE message_id = $1", message_id)
 
     async def add_rule(self, id: str, content: str):
-        await self.execute(
-            "INSERT INTO rules (id, content) VALUES ($1, $2)", id, content
-        )
+        await self.execute("INSERT INTO rules (id, content) VALUES ($1, $2)", id, content)
 
     async def remove_rule(self, id: str):
         await self.execute("DELETE FROM rules WHERE id = $1", id)
 
     async def add_tempban(self, id: int, unban_at: datetime):
-        await self.execute(
-            "INSERT INTO bans (id, unban_at) VALUES ($1, $2)", id, unban_at
-        )
+        await self.execute("INSERT INTO bans (id, unban_at) VALUES ($1, $2)", id, unban_at)
 
     async def remove_bans(self, id: int):
         await self.execute("DELETE FROM bans WHERE id = $1", id)

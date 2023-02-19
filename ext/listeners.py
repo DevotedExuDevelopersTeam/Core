@@ -56,9 +56,7 @@ class MessageListeners(Cog):
                 title=f"Message deleted from #{message.channel.name}",
                 description=message.content,
                 timestamp=datetime.now(),
-            ).set_author(
-                name=message.author, icon_url=message.author.display_avatar.url
-            ),
+            ).set_author(name=message.author, icon_url=message.author.display_avatar.url),
             files=[await a.to_file() for a in message.attachments],
         )
 
@@ -69,18 +67,13 @@ class MessageListeners(Cog):
 
         if message.channel.id == HU_CHANNEL_ID and message.content.lower() != "hu":
             await message.delete()
-            await message.channel.send(
-                f"{message.author.mention} hu only!", delete_after=3
-            )
+            await message.channel.send(f"{message.author.mention} hu only!", delete_after=3)
 
         elif (
-            message.channel.id == COUNTING_CHANNEL_ID
-            and not disnake.utils.remove_markdown(message.content).isnumeric()
+            message.channel.id == COUNTING_CHANNEL_ID and not disnake.utils.remove_markdown(message.content).isnumeric()
         ):
             await message.delete()
-            await message.channel.send(
-                f"{message.author.mention} numbers only!", delete_after=3
-            )
+            await message.channel.send(f"{message.author.mention} numbers only!", delete_after=3)
 
 
 class MembersListeners(Cog):

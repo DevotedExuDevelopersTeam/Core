@@ -29,20 +29,14 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
             )
             return
 
-        for member in message.mentions[
-            :5
-        ]:  # the amount is limited to 5 to prevent spam pings
+        for member in message.mentions[:5]:  # the amount is limited to 5 to prevent spam pings
             afk, set_at = await self.bot.db.get_member_afk(member.id)
             if afk is not None:
-                await message.channel.send(
-                    f"**{member}** is AFK: {afk} {datetime_to_timestamp(set_at, 'R')}"
-                )
+                await message.channel.send(f"**{member}** is AFK: {afk} {datetime_to_timestamp(set_at, 'R')}")
                 return
 
     @commands.slash_command(name="whois", description="Shows info about a person")
-    async def whois(
-        self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None
-    ):
+    async def whois(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         user = user or inter.author
         embed = (
             disnake.Embed(color=0x00FFFF, title=str(user))
@@ -72,17 +66,13 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
                 os.remove(path)
             except FileNotFoundError:
                 pass
-            await inter.send(
-                embed=SuccessEmbed(inter.user, "Successfully reset your background")
-            )
+            await inter.send(embed=SuccessEmbed(inter.user, "Successfully reset your background"))
             return
         await inter.response.defer()
         # noinspection PyTypeChecker
         await bg.save(path)
         await resize_bg(path)
-        await inter.send(
-            embed=SuccessEmbed(inter.user, "Successfully set your background")
-        )
+        await inter.send(embed=SuccessEmbed(inter.user, "Successfully set your background"))
 
     @commands.slash_command(name="afk", description="Sets an AFK")
     async def afk(self, inter: disnake.ApplicationCommandInteraction, text: str):
@@ -95,13 +85,9 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
         inter: disnake.ApplicationCommandInteraction,
         rule: RuleConverter = commands.Param(autocomplete=rules_autocomplete),
     ):
-        await inter.send(
-            embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=rule.content)
-        )
+        await inter.send(embed=disnake.Embed(color=0x00FFFF, title=rule.id, description=rule.content))
 
-    @commands.slash_command(
-        name="math", description="Evaluates a simple math expression"
-    )
+    @commands.slash_command(name="math", description="Evaluates a simple math expression")
     async def math(self, inter: disnake.ApplicationCommandInteraction, expr: str):
         try:
             result = evaluate(expr)
@@ -112,9 +98,7 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
 
     @commands.slash_command(name="dm", description="DMs member a message")
     @staff_only()
-    async def dm(
-        self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, text
-    ):
+    async def dm(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, text):
         view = ConfirmationView(inter.author.id)
         await inter.send(
             f"Are you sure you want to DM {user.mention} this text?",
@@ -132,10 +116,6 @@ You were AFK for **{timedelta_to_full_str(datetime.now() - set_at)}**"
                         description=text,
                     )
                 )
-                await inter.send(
-                    embed=SuccessEmbed(
-                        inter.user, f"Successfully sent DM to {user.mention}"
-                    )
-                )
+                await inter.send(embed=SuccessEmbed(inter.user, f"Successfully sent DM to {user.mention}"))
             except disnake.HTTPException:
                 await inter.send("Their DMs are closed for bot")

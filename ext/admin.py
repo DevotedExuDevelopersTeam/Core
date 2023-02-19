@@ -46,22 +46,16 @@ asyncio.run_coroutine_threadsafe(asyncf(), asyncio.get_running_loop())"""
             exec(code, env)
         except Exception as e:
             await inter.send(
-                embed=disnake.Embed(
-                    color=0xFF0000, title="Exception Occurred"
-                ).add_field("Exception", str(e))
+                embed=disnake.Embed(color=0xFF0000, title="Exception Occurred").add_field("Exception", str(e))
             )
 
     @commands.Cog.listener("on_member_join")
     async def remove_left(self, member: disnake.Member):
-        await self.bot.db.execute(
-            "UPDATE scores SET left_server = false WHERE id = $1", member.id
-        )
+        await self.bot.db.execute("UPDATE scores SET left_server = false WHERE id = $1", member.id)
 
     @commands.Cog.listener("on_member_remove")
     async def add_left(self, member: disnake.Member):
-        await self.bot.db.execute(
-            "UPDATE scores SET left_server = true WHERE id = $1", member.id
-        )
+        await self.bot.db.execute("UPDATE scores SET left_server = true WHERE id = $1", member.id)
 
     @commands.slash_command(
         name="scanleftmembers",
@@ -73,9 +67,7 @@ asyncio.run_coroutine_threadsafe(asyncf(), asyncio.get_running_loop())"""
         all_actual_members = {m.id for m in inter.guild.members}
         db_members = {
             r["id"]
-            for r in await self.bot.db.execute(
-                "SELECT id FROM scores WHERE NOT left_server", fetch_mode=FetchMode.ALL
-            )
+            for r in await self.bot.db.execute("SELECT id FROM scores WHERE NOT left_server", fetch_mode=FetchMode.ALL)
         }
         left_members = db_members - all_actual_members
         async with self.bot.db.pool.acquire() as con:

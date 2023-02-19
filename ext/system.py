@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, time, timedelta
 
 import disnake
 from disnake.ext import commands, tasks
 
 from utils.bot import Bot
 from utils.cog import Cog
+from utils.constants import DAILY_SCORE_TRACKER_ID, MEMBERS_TRACKER_ID
 from utils.enums import FetchMode
 from utils.errors import UNKNOWN, get_error_msg
-from utils.constants import MEMBERS_TRACKER_ID, DAILY_SCORE_TRACKER_ID
 
 
 class SystemLoops(Cog):
@@ -29,9 +29,7 @@ class SystemLoops(Cog):
             members_tracker = self.bot.server.get_channel(MEMBERS_TRACKER_ID)
             await members_tracker.edit(name=f"Members: {self.bot.server.member_count}")
             daily_score_tracker = self.bot.server.get_channel(DAILY_SCORE_TRACKER_ID)
-            await daily_score_tracker.edit(
-                name=f"Daily Score: {await self.bot.db.get_total_daily_score()}"
-            )
+            await daily_score_tracker.edit(name=f"Daily Score: {await self.bot.db.get_total_daily_score()}")
         except Exception as e:
             self.bot.log.error("Failed to update trackers", exc_info=e)
 
@@ -67,21 +65,15 @@ class SystemLoops(Cog):
             if channel is None:
                 self.bot.log.warning("Failed to unlock channel %s", r["id"])
                 continue
-            await channel.set_permissions(
-                self.bot.server.default_role, send_messages=None
-            )
+            await channel.set_permissions(self.bot.server.default_role, send_messages=None)
 
-        await self.bot.db.execute(
-            "DELETE FROM locked_channels WHERE unlock_at < $1", now
-        )
+        await self.bot.db.execute("DELETE FROM locked_channels WHERE unlock_at < $1", now)
 
     @tasks.loop(minutes=30)
     async def bans_remover(self):
         await self.bot.wait_until_ready()
         now = datetime.now()
-        records = await self.bot.db.execute(
-            "SELECT * FROM bans WHERE unban_at < $1", now, fetch_mode=FetchMode.ALL
-        )
+        records = await self.bot.db.execute("SELECT * FROM bans WHERE unban_at < $1", now, fetch_mode=FetchMode.ALL)
         for r in records:
             try:
                 await self.bot.server.unban(disnake.Object(r["id"]))
@@ -106,9 +98,7 @@ class SystemLoops(Cog):
 
 class SystemListeners(Cog):
     @Cog.listener()
-    async def on_slash_command_error(
-        self, inter: disnake.ApplicationCommandInteraction, error: commands.CommandError
-    ):
+    async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error: commands.CommandError):
         text = get_error_msg(error)
         if text is UNKNOWN:
             raise error

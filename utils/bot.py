@@ -29,9 +29,7 @@ class Bot(commands.Bot):
         intents.dm_messages = False
         super().__init__(
             intents=intents,
-            activity=disnake.Activity(
-                type=disnake.ActivityType.watching, name="the server"
-            ),
+            activity=disnake.Activity(type=disnake.ActivityType.watching, name="the server"),
             status=disnake.Status.idle,
         )
         self.log = Logger()
@@ -81,9 +79,7 @@ class Bot(commands.Bot):
         sys.modules[module_name] = module
         members = inspect.getmembers(
             module,
-            lambda x: inspect.isclass(x)
-            and issubclass(x, commands.Cog)
-            and x.__name__ != "Cog",
+            lambda x: inspect.isclass(x) and issubclass(x, commands.Cog) and x.__name__ != "Cog",
         )
         for member in members:
             self.add_cog(member[1](self))
@@ -126,7 +122,7 @@ class Bot(commands.Bot):
             self.owner.mention,
             embed=disnake.Embed(
                 colour=0xFF0000,
-                title=f"❗ Unexpected error occurred",
+                title="❗ Unexpected error occurred",
             ).add_field("Traceback (most recent call last):", tb[-1000:], inline=False),
             file=disnake.File(path),
         )
@@ -152,9 +148,7 @@ class DisLogger:
         color: int = 0xFF0000,
     ):
         embed = (
-            disnake.Embed(
-                color=color, title=action_name.capitalize(), timestamp=datetime.now()
-            )
+            disnake.Embed(color=color, title=action_name.capitalize(), timestamp=datetime.now())
             .add_field("Target", f"**{target}** ({target.mention})\nID: {target.id}")
             .add_field(
                 "Issued By",

@@ -10,7 +10,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 async def fetch_last_video(youtube_id: str) -> str:
     async with aiohttp.ClientSession() as session:
         r = await session.get(
-            f"https://www.googleapis.com/youtube/v3/activities",
+            "https://www.googleapis.com/youtube/v3/activities",
             params={
                 "key": GOOGLE_API_KEY,
                 "part": "contentDetails",

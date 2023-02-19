@@ -14,9 +14,7 @@ utc = pendulum.timezone("UTC")
 
 class TimeConverter(Converter, timedelta):
     @converter_method
-    async def convert(
-        self, inter: disnake.ApplicationCommandInteraction, argument: str
-    ) -> timedelta:
+    async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> timedelta:
         arg = argument.lower().replace(" ", "")
         values = {"days": 0, "hours": 0, "minutes": 0, "seconds": 0}
         for k in values.copy():
@@ -44,9 +42,7 @@ class Rule:
 
 class RuleConverter(Converter, Rule):
     @converter_method
-    async def convert(
-        self, inter: disnake.ApplicationCommandInteraction, argument: str
-    ) -> Rule:
+    async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> Rule:
         argument = argument.strip().lower()
         rules = await get_rules(inter.bot)
         if argument not in rules:
@@ -57,9 +53,7 @@ class RuleConverter(Converter, Rule):
 
 class DateConverter(Converter, pendulum.Date):
     @converter_method
-    async def convert(
-        self, inter: disnake.ApplicationCommandInteraction, argument: str
-    ) -> pendulum.Date:
+    async def convert(self, inter: disnake.ApplicationCommandInteraction, argument: str) -> pendulum.Date:
         try:
             d = utc.convert(pendulum.parse(argument, strict=False))
             if isinstance(d, pendulum.DateTime):

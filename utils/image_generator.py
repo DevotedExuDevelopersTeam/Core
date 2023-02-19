@@ -5,8 +5,8 @@ from io import BytesIO
 from random import randint
 from urllib.request import build_opener, install_opener, urlretrieve
 
-from PIL import Image, ImageDraw, ImageFont
 from disnake import Role, User
+from PIL import Image, ImageDraw, ImageFont
 
 from utils.bot import Bot
 
@@ -78,12 +78,8 @@ def _draw_leaderboard(bot: Bot, page: int, top_data) -> BytesIO:
                 member_name = member_name[:-4] + "..."
             else:
                 member_name = member_name[:-1] + "..."
-        draw.text(
-            (PLACE_X, y_pos), text=str(pos), fill=BASE_COLOR, font=font, anchor="ls"
-        )
-        draw.text(
-            (MEMBER_X, y_pos), text=member_name, fill=BASE_COLOR, font=font, anchor="ls"
-        )
+        draw.text((PLACE_X, y_pos), text=str(pos), fill=BASE_COLOR, font=font, anchor="ls")
+        draw.text((MEMBER_X, y_pos), text=member_name, fill=BASE_COLOR, font=font, anchor="ls")
         draw.text(
             (SCORE_X, y_pos),
             text=number_to_numstring(entry["score_total"]),
@@ -174,9 +170,7 @@ def _draw_rank_card(
         anchor="mm",
     )
 
-    squares_amount = (
-        10 if not score_to_next_role else int(current_score / score_to_next_role * 10)
-    )
+    squares_amount = 10 if not score_to_next_role else int(current_score / score_to_next_role * 10)
     for i in range(squares_amount):
         x_left = SQUARE_LEFT_X + SQUARE_STEP * i
         x_right = x_left + SQUARE_SIZE
@@ -189,9 +183,7 @@ def _draw_rank_card(
         score_string = f"{number_to_numstring(current_score)} / {number_to_numstring(score_to_next_role)}"
     else:
         score_string = number_to_numstring(current_score)
-    draw.text(
-        SCORE_POSITION, f"{score_string}", fill=WHITE, font=score_role_font, anchor="mm"
-    )
+    draw.text(SCORE_POSITION, f"{score_string}", fill=WHITE, font=score_role_font, anchor="mm")
 
     bi = BytesIO()
     template.save(bi, "PNG")

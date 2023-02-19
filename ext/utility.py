@@ -14,9 +14,7 @@ class ButtonRoles(Cog):
 
         self._button_roles: dict[str, int] = {}
 
-    async def cog_slash_command_check(
-        self, inter: disnake.ApplicationCommandInteraction
-    ) -> bool:
+    async def cog_slash_command_check(self, inter: disnake.ApplicationCommandInteraction) -> bool:
         if inter.user.guild_permissions.manage_guild:
             return True
         raise commands.MissingPermissions(["manage_guild"])
@@ -72,9 +70,7 @@ class ButtonRoles(Cog):
         await self.bot.db.add_button_role(id, role.id, message_id)
         await inter.send(embed=SuccessEmbed(inter.user, "Added a new button role"))
 
-    @commands.slash_command(
-        name="removebuttonrole", description="Removes a button role"
-    )
+    @commands.slash_command(name="removebuttonrole", description="Removes a button role")
     async def removebuttonrole(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -90,18 +86,11 @@ class ButtonRoles(Cog):
         await inter.response.defer()
         view = disnake.ui.View.from_message(message)
         for component in view.children:
-            if (
-                isinstance(component, disnake.ui.Button)
-                and component.label == button_name
-            ):
+            if isinstance(component, disnake.ui.Button) and component.label == button_name:
                 view.remove_item(component)
                 await message.edit(view=view)
                 await self.bot.db.remove_button_role(component.custom_id)
-                await inter.send(
-                    embed=SuccessEmbed(
-                        inter.user, "Successfully removed button role from that message"
-                    )
-                )
+                await inter.send(embed=SuccessEmbed(inter.user, "Successfully removed button role from that message"))
                 return
 
         await inter.send(

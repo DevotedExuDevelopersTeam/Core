@@ -10,14 +10,14 @@ from utils.bot import Bot
 from utils.cog import Cog
 from utils.constants import (
     PROMOCODE_CHANNEL_ID,
+    PROMOCODE_NOTIFICATIONS,
+    PROMOCODE_REQUIRED_SCORE,
     XP_BOUNDS,
     XP_COOLDOWN_SECONDS,
     XP_IGNORED_CHANNELS_IDS,
-    PROMOCODE_NOTIFICATIONS,
-    PROMOCODE_REQUIRED_SCORE,
 )
 from utils.converters import DateConverter
-from utils.embeds import BaseEmbed, SuccessEmbed
+from utils.embeds import SuccessEmbed
 from utils.enums import FetchMode
 from utils.errors import AdminOnly
 from utils.image_generator import draw_leaderboard, draw_rank_card
@@ -35,13 +35,9 @@ class Levels(Cog):
         self.cooldowns_cleaner.start()
 
     def _is_member_on_cooldown(self, member_id: int) -> bool:
-        return (
-            member_id in self.cooldowns and self.cooldowns[member_id] > datetime.now()
-        )
+        return member_id in self.cooldowns and self.cooldowns[member_id] > datetime.now()
 
-    async def _check_level_roles(
-        self, member: disnake.Member, channel: disnake.TextChannel
-    ):
+    async def _check_level_roles(self, member: disnake.Member, channel: disnake.TextChannel):
         score = await self.bot.db.get_users_score(member.id)
         levels = await self.bot.db.get_level_roles()
         all_roles = set(levels.values())
@@ -61,9 +57,7 @@ class Levels(Cog):
         if len(roles_to_remove) > 0:
             await member.remove_roles(*[disnake.Object(i) for i in roles_to_remove])
 
-    async def _check_promocodes(
-        self, member: disnake.Member, channel: disnake.TextChannel
-    ):
+    async def _check_promocodes(self, member: disnake.Member, channel: disnake.TextChannel):
         weekly_score = (
             await self.bot.db.execute(
                 "SELECT score_weekly FROM scores WHERE id = $1",
@@ -72,9 +66,7 @@ class Levels(Cog):
             )
             or 0
         )
-        required_notifications = set(
-            filter(lambda x: x <= weekly_score, PROMOCODE_NOTIFICATIONS)
-        )
+        required_notifications = set(filter(lambda x: x <= weekly_score, PROMOCODE_NOTIFICATIONS))
         done_notifications = set(
             [
                 r["score"]
@@ -129,20 +121,14 @@ class Levels(Cog):
         ):
             return
 
-        self.cooldowns[message.author.id] = datetime.now() + timedelta(
-            seconds=XP_COOLDOWN_SECONDS
-        )
-        await self.bot.db.update_users_score(
-            message.author.id, random.randint(*XP_BOUNDS)
-        )
+        self.cooldowns[message.author.id] = datetime.now() + timedelta(seconds=XP_COOLDOWN_SECONDS)
+        await self.bot.db.update_users_score(message.author.id, random.randint(*XP_BOUNDS))
         await self._check_level_roles(message.author, message.channel)
         await self._check_promocodes(message.author, message.channel)
 
     @commands.slash_command(name="rank", description="Shows activity info")
     @commands.cooldown(1, 15, commands.BucketType.user)
-    async def rank(
-        self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None
-    ):
+    async def rank(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         await inter.response.defer()
         user = user or inter.user
         levels = await self.bot.db.get_level_roles()
@@ -153,9 +139,7 @@ class Levels(Cog):
             fetch_mode=FetchMode.ROW,
         )
         next_score = get_next_score(current_score, levels.keys())
-        next_role = (
-            inter.guild.get_role(levels[next_score]) if next_score is not None else None
-        )
+        next_role = inter.guild.get_role(levels[next_score]) if next_score is not None else None
 
         await inter.send(
             f"Daily score: **{score_daily:,}**\nWeekly score: **{score_weekly:,}**",
@@ -172,28 +156,18 @@ class Levels(Cog):
         )
         f.close()
 
-    @commands.slash_command(
-        name="leaderboard", description="Displays user's leaderboard"
-    )
+    @commands.slash_command(name="leaderboard", description="Displays user's leaderboard")
     @commands.cooldown(1, 15, commands.BucketType.user)
-    async def leaderboard(
-        self, inter: disnake.ApplicationCommandInteraction, page: int = 1
-    ):
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, page: int = 1):
         await inter.response.defer()
-        await inter.send(
-            file=disnake.File(
-                f := await draw_leaderboard(self.bot, page), filename="leaderboard.png"
-            )
-        )
+        await inter.send(file=disnake.File(f := await draw_leaderboard(self.bot, page), filename="leaderboard.png"))
         f.close()
 
     @commands.slash_command(name="levels", description="Shows all leveled roles")
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def levels(self, inter: disnake.ApplicationCommandInteraction):
         lvls = await self.bot.db.get_level_roles()
-        lvls_format: list[tuple[str, str]] = [
-            (f"`{sep_num(k, ' ')}`", f"<@&{v}>") for k, v in lvls.items()
-        ]
+        lvls_format: list[tuple[str, str]] = [(f"`{sep_num(k, ' ')}`", f"<@&{v}>") for k, v in lvls.items()]
         lvls_format.insert(0, ("Score", "Role"))
         await inter.send(
             embed=disnake.Embed(
@@ -205,9 +179,7 @@ class Levels(Cog):
 
 
 class LevelsManagement(Cog):
-    async def cog_slash_command_check(
-        self, inter: disnake.ApplicationCommandInteraction
-    ) -> bool:
+    async def cog_slash_command_check(self, inter: disnake.ApplicationCommandInteraction) -> bool:
         if inter.user.guild_permissions.manage_guild:
             return True
         raise AdminOnly()
@@ -232,9 +204,7 @@ class LevelsManagement(Cog):
         pass
 
     @removelevel.sub_command(name="role", description="Removes a level by role")
-    async def removelevel_role(
-        self, inter: disnake.ApplicationCommandInteraction, role: disnake.Role
-    ):
+    async def removelevel_role(self, inter: disnake.ApplicationCommandInteraction, role: disnake.Role):
         role_id, required_score = await self.bot.db.remove_level(role)
         if role_id is None:
             await inter.send("This role is not assigned as level role", ephemeral=True)
@@ -247,9 +217,7 @@ class LevelsManagement(Cog):
         )
 
     @removelevel.sub_command(name="score", description="Removes a level by score")
-    async def removelevel_score(
-        self, inter: disnake.ApplicationCommandInteraction, score: int
-    ):
+    async def removelevel_score(self, inter: disnake.ApplicationCommandInteraction, score: int):
         role_id, required_score = await self.bot.db.remove_level(score)
         if role_id is None:
             await inter.send("There's no role assigned to this score", ephemeral=True)
@@ -276,9 +244,7 @@ class LevelsManagement(Cog):
             )
         )
 
-    @commands.slash_command(
-        name="removescore", description="Removes score from a member"
-    )
+    @commands.slash_command(name="removescore", description="Removes score from a member")
     async def removescore(
         self,
         inter: disnake.ApplicationCommandInteraction,

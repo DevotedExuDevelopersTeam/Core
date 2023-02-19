@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable, Generic, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Awaitable, Callable, Generic, TypeVar
 
 import disnake
 
@@ -86,9 +86,7 @@ class ApplicationsView(disnake.ui.View):
         async def staff_check(inter: disnake.Interaction):
             role = inter.guild.get_role(STAFF_APPL_MIN_ROLE_ID)
             if role not in inter.user.roles:
-                await inter.send(
-                    f"You need {role.mention} to apply for staff", ephemeral=True
-                )
+                await inter.send(f"You need {role.mention} to apply for staff", ephemeral=True)
                 return False
             return True
 
@@ -122,9 +120,7 @@ class ApplicationControlsView(disnake.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @disnake.ui.button(
-        label="Close", style=disnake.ButtonStyle.red, custom_id="appl_close"
-    )
+    @disnake.ui.button(label="Close", style=disnake.ButtonStyle.red, custom_id="appl_close")
     async def close(self, _, inter: disnake.MessageInteraction):
         await inter.send("Closing...", ephemeral=True)
         await inter.channel.delete()
@@ -133,24 +129,18 @@ class ApplicationControlsView(disnake.ui.View):
         except ValueError:
             pass
 
-    @disnake.ui.button(
-        label="Done", style=disnake.ButtonStyle.green, custom_id="appl_done"
-    )
+    @disnake.ui.button(label="Done", style=disnake.ButtonStyle.green, custom_id="appl_done")
     async def done(self, _, inter: disnake.MessageInteraction):
         await inter.response.defer(with_message=True)
-        await inter.channel.set_permissions(
-            inter.user, send_messages=False, read_messages=True
-        )
+        await inter.channel.set_permissions(inter.user, send_messages=False, read_messages=True)
         for button in self.children:
             if isinstance(button, disnake.ui.Button):
-                match button.custom_id:
+                match button.custom_id:  # noqa: E999
                     case "appl_done":
                         button.disabled = True
                     case "appl_unlock":
                         button.disabled = False
-        await inter.bot.owner.send(
-            f"New application by {inter.author} please check {inter.channel.mention}"
-        )
+        await inter.bot.owner.send(f"New application by {inter.author} please check {inter.channel.mention}")
         await inter.message.edit(view=self)
         await inter.send(
             "We have notified staff that you have sent the form, now please wait for them to review it. "
@@ -163,9 +153,7 @@ class ApplicationControlsView(disnake.ui.View):
         custom_id="appl_unlock",
         disabled=True,
     )
-    async def unlock(
-        self, button: disnake.ui.Button, inter: disnake.MessageInteraction
-    ):
+    async def unlock(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         if not await is_staff(inter.bot, inter):
             await inter.send("Only staff can use this", ephemeral=True)
             return
@@ -176,13 +164,9 @@ class ApplicationControlsView(disnake.ui.View):
         if member is None or isinstance(member, disnake.User):
             await inter.send("Seems like this member has left the server")
             return
-        await inter.channel.set_permissions(
-            member, send_messages=True, read_messages=True
-        )
+        await inter.channel.set_permissions(member, send_messages=True, read_messages=True)
         await inter.send("Unlocked the channel", ephemeral=True)
-        await inter.channel.send(
-            f"{member.mention}, {inter.author.mention} has come to review your application!"
-        )
+        await inter.channel.send(f"{member.mention}, {inter.author.mention} has come to review your application!")
 
 
 class ApplicationButton(disnake.ui.Button):
@@ -204,13 +188,10 @@ class ApplicationButton(disnake.ui.Button):
         if self.pred is not None and not await self.pred(interaction):
             return
         link = APPLICATIONS_LINKS[self.custom_id]
-        category: disnake.CategoryChannel = interaction.guild.get_channel(
-            JOB_APPLICATIONS_CATEGORY_ID
-        )
+        category: disnake.CategoryChannel = interaction.guild.get_channel(JOB_APPLICATIONS_CATEGORY_ID)
         if category is None:
             await interaction.send(
-                "Sorry, I was unable to find the system category. "
-                "Please contact administrators about this.",
+                "Sorry, I was unable to find the system category. " "Please contact administrators about this.",
                 ephemeral=True,
             )
             return
@@ -218,12 +199,8 @@ class ApplicationButton(disnake.ui.Button):
         channel = await category.create_text_channel(
             name=f"ja-{interaction.user}",
             overwrites={
-                interaction.guild.default_role: disnake.PermissionOverwrite(
-                    read_messages=False
-                ),
-                interaction.user: disnake.PermissionOverwrite(
-                    read_messages=True, send_messages=False
-                ),
+                interaction.guild.default_role: disnake.PermissionOverwrite(read_messages=False),
+                interaction.user: disnake.PermissionOverwrite(read_messages=True, send_messages=False),
                 interaction.guild.get_role(STAFF_ROLE_ID): disnake.PermissionOverwrite(
                     read_messages=True, send_messages=True
                 ),

@@ -3,11 +3,7 @@ from disnake.ext import commands, tasks
 
 from utils.checks import is_staff
 from utils.cog import Cog
-from utils.constants import (
-    APPLICATIONS_CHANNEL_ID,
-    NEW_VIDEOS_ROLE_ID,
-    YOUTUBE_CHANNEL_ID,
-)
+from utils.constants import APPLICATIONS_CHANNEL_ID, NEW_VIDEOS_ROLE_ID, YOUTUBE_CHANNEL_ID
 from utils.embeds import SuccessEmbed
 from utils.errors import YoutubeFetchFailure
 from utils.youtube import fetch_last_video
@@ -25,12 +21,8 @@ class YoutubeFetchers(Cog):
     async def youtuber_remover(self, member: disnake.Member):
         is_youtuber = await self.bot.db.remove_youtuber(member.id)
         if is_youtuber:
-            self.bot.log.warning(
-                "Youtuber %s left so was removed from content creators program", member
-            )
-            await self.bot.dis_log.log_target_action(
-                "Youtuber Autoremove", member, member.guild.me
-            )
+            self.bot.log.warning("Youtuber %s left so was removed from content creators program", member)
+            await self.bot.dis_log.log_target_action("Youtuber Autoremove", member, member.guild.me)
             for t in self.queue.copy():
                 if t[0] == member.id:
                     self.queue.remove(t)
@@ -78,9 +70,7 @@ class YoutubeFetchers(Cog):
 
 
 class YoutubeManagement(Cog):
-    async def cog_slash_command_check(
-        self, inter: disnake.ApplicationCommandInteraction
-    ) -> bool:
+    async def cog_slash_command_check(self, inter: disnake.ApplicationCommandInteraction) -> bool:
         return await is_staff(self.bot, inter)
 
     @commands.slash_command(name="addyt", description="Adds a new youtuber")
@@ -100,9 +90,7 @@ class YoutubeManagement(Cog):
         )
 
     @commands.slash_command(name="removeyt", description="Removes a youtuber")
-    async def removeyt(
-        self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member
-    ):
+    async def removeyt(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
         is_youtuber = await self.bot.db.remove_youtuber(user.id)
         if is_youtuber:
             await inter.send(

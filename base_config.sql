@@ -41,11 +41,11 @@ CREATE TABLE IF NOT EXISTS levels
 
 CREATE TABLE IF NOT EXISTS scores
 (
-    id          BIGINT PRIMARY KEY,
-    score_total INT DEFAULT 0,
-    score_daily INT DEFAULT 0,
-    score_weekly INT DEFAULT 0,
-    left_server BOOLEAN DEFAULT false
+    id           BIGINT PRIMARY KEY,
+    score_total  INT     DEFAULT 0,
+    score_daily  INT     DEFAULT 0,
+    score_weekly INT     DEFAULT 0,
+    left_server  BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS selfroles
@@ -78,21 +78,23 @@ CREATE TABLE IF NOT EXISTS youtubers
 
 CREATE TABLE IF NOT EXISTS promocodes
 (
-    code VARCHAR(8) PRIMARY KEY ,
+    code       VARCHAR(8) PRIMARY KEY,
     expires_at DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS promo_notifications
 (
-    id BIGINT NOT NULL,
-    score INT NOT NULL,
+    id    BIGINT NOT NULL,
+    score INT    NOT NULL,
     UNIQUE (id, score)
 );
 
 CREATE TABLE IF NOT EXISTS version
 (
-    id SMALLINT PRIMARY KEY,
+    id      SMALLINT PRIMARY KEY,
     version INT
 );
 
-INSERT INTO version (id, version) VALUES (0, 2) ON CONFLICT DO NOTHING;
+INSERT INTO version (id, version)
+VALUES (0, 2)
+ON CONFLICT DO NOTHING;

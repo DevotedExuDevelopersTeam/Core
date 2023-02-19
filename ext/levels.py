@@ -1,14 +1,24 @@
 import random
 from datetime import datetime, timedelta
 
+import asyncpg
 import disnake
 from disnake.ext import commands, tasks
 from tabulate import tabulate
 
 from utils.bot import Bot
 from utils.cog import Cog
-from utils.constants import XP_BOUNDS, XP_COOLDOWN_SECONDS, XP_IGNORED_CHANNELS_IDS
-from utils.embeds import SuccessEmbed
+from utils.constants import (
+    PROMOCODE_CHANNEL_ID,
+    XP_BOUNDS,
+    XP_COOLDOWN_SECONDS,
+    XP_IGNORED_CHANNELS_IDS,
+    PROMOCODE_NOTIFICATIONS,
+    PROMOCODE_REQUIRED_SCORE,
+)
+from utils.converters import DateConverter
+from utils.embeds import BaseEmbed, SuccessEmbed
+from utils.enums import FetchMode
 from utils.errors import AdminOnly
 from utils.image_generator import draw_leaderboard, draw_rank_card
 from utils.utils import get_next_score, sep_num
@@ -51,6 +61,50 @@ class Levels(Cog):
         if len(roles_to_remove) > 0:
             await member.remove_roles(*[disnake.Object(i) for i in roles_to_remove])
 
+    async def _check_promocodes(
+        self, member: disnake.Member, channel: disnake.TextChannel
+    ):
+        weekly_score = (
+            await self.bot.db.execute(
+                "SELECT score_weekly FROM scores WHERE id = $1",
+                member.id,
+                fetch_mode=FetchMode.VAL,
+            )
+            or 0
+        )
+        required_notifications = set(
+            filter(lambda x: x <= weekly_score, PROMOCODE_NOTIFICATIONS)
+        )
+        done_notifications = set(
+            [
+                r["score"]
+                for r in await self.bot.db.execute(
+                    "SELECT score FROM promo_notifications WHERE id = $1",
+                    member.id,
+                    fetch_mode=FetchMode.ALL,
+                )
+            ]
+        )
+        required_notifications -= done_notifications
+        if len(required_notifications) > 0:
+            for score in required_notifications:
+                await self.bot.db.execute(
+                    "INSERT INTO promo_notifications (id, score) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                    member.id,
+                    score,
+                )
+            if weekly_score < PROMOCODE_REQUIRED_SCORE:
+                await channel.send(
+                    f"{member.mention}, you just hit **{max(required_notifications)}** weekly score! "
+                    f"Earn **{PROMOCODE_REQUIRED_SCORE - weekly_score:,}** more till the end of the week "
+                    "to receive the promocode!"
+                )
+        if weekly_score > PROMOCODE_REQUIRED_SCORE:
+            await channel.send(
+                f"🥳 Congratulations, {member.mention}, you earned **{PROMOCODE_REQUIRED_SCORE:,}** weekly score "
+                f"which means you can now **claim a promocode** in <#{PROMOCODE_CHANNEL_ID}>!"
+            )
+
     def _is_last_member(self, msg: disnake.Message) -> bool:
         is_last = self.last_messages.get(msg.channel.id, None) == msg.author.id
         self.last_messages[msg.channel.id] = msg.author.id
@@ -82,6 +136,7 @@ class Levels(Cog):
             message.author.id, random.randint(*XP_BOUNDS)
         )
         await self._check_level_roles(message.author, message.channel)
+        await self._check_promocodes(message.author, message.channel)
 
     @commands.slash_command(name="rank", description="Shows activity info")
     @commands.cooldown(1, 15, commands.BucketType.user)
@@ -92,12 +147,18 @@ class Levels(Cog):
         user = user or inter.user
         levels = await self.bot.db.get_level_roles()
         current_score = await self.bot.db.get_users_score(user.id)
+        score_daily, score_weekly = await self.bot.db.execute(
+            "SELECT score_daily, score_weekly FROM scores WHERE id = $1",
+            inter.user.id,
+            fetch_mode=FetchMode.ROW,
+        )
         next_score = get_next_score(current_score, levels.keys())
         next_role = (
             inter.guild.get_role(levels[next_score]) if next_score is not None else None
         )
 
         await inter.send(
+            f"Daily score: **{score_daily:,}**\nWeekly score: **{score_weekly:,}**",
             file=disnake.File(
                 f := await draw_rank_card(
                     user,
@@ -107,7 +168,7 @@ class Levels(Cog):
                     next_score,
                 ),
                 filename="rank.png",
-            )
+            ),
         )
         f.close()
 
@@ -231,3 +292,22 @@ class LevelsManagement(Cog):
                 f"Successfully removed `{sep_num(score, ' ')}` score from {user.mention}",
             )
         )
+
+    @commands.slash_command(name="addpromo", description="Add a new promocode")
+    @commands.has_permissions(manage_guild=True)
+    async def addpromo(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        promocode: str,
+        expires_at: DateConverter,
+    ):
+        try:
+            await self.bot.db.execute(
+                "INSERT INTO promocodes (code, expires_at) VALUES ($1, $2)",
+                promocode,
+                expires_at,
+            )
+        except asyncpg.UniqueViolationError:
+            await inter.send("This promocode is already added!")
+            return
+        await inter.send("Successfully added new promocode!")

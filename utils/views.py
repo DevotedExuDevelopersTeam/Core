@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable, Generic, TypeVar
+from typing import Awaitable, Callable, Generic, TypeVar, TYPE_CHECKING
 
 import disnake
 
@@ -6,9 +6,14 @@ from utils.checks import is_staff
 from utils.constants import (
     APPLICATIONS_LINKS,
     JOB_APPLICATIONS_CATEGORY_ID,
+    PROMOCODE_REQUIRED_SCORE,
     STAFF_APPL_MIN_ROLE_ID,
     STAFF_ROLE_ID,
 )
+from utils.enums import FetchMode
+
+if TYPE_CHECKING:
+    from utils.bot import Bot
 
 T = TypeVar("T")
 
@@ -233,3 +238,46 @@ class ApplicationButton(disnake.ui.Button):
         )
         ApplicationsView.applicants.append(interaction.author.id)
         await interaction.send(f"Please head to {channel.mention}", ephemeral=True)
+
+
+class PromocodeView(disnake.ui.View):
+    def __init__(self, bot: "Bot"):
+        super().__init__(timeout=None)
+        self.bot = bot
+
+    @disnake.ui.button(
+        label="Get Promocode",
+        custom_id="get-promocode",
+        style=disnake.ButtonStyle.blurple,
+    )
+    async def get_promocode(self, _, inter: disnake.MessageInteraction):
+        weekly_score: int = (
+            await self.bot.db.execute(
+                "SELECT score_weekly FROM scores WHERE id = $1",
+                inter.author.id,
+                fetch_mode=FetchMode.VAL,
+            )
+            or 0
+        )
+        if weekly_score < PROMOCODE_REQUIRED_SCORE:
+            await inter.send(
+                f"You need **{PROMOCODE_REQUIRED_SCORE:,}** weekly score to claim the promocode! "
+                f"You currently have **{weekly_score:,}**. Score can be earned by chatting!",
+                ephemeral=True,
+            )
+            return
+        promocode = await self.bot.db.execute(
+            "SELECT code, MIN(expires_at) FROM promocodes WHERE expires_at > CURRENT_DATE GROUP BY code",
+            fetch_mode=FetchMode.VAL,
+        )
+        if promocode is None:
+            await inter.send(
+                "Sorry, there are no available promocodes at the moment. Please wait until admins add more!",
+                ephemeral=True,
+            )
+            return
+        await inter.send(
+            f"🤫 here's your promocode: ||**{promocode}**||\n\n"
+            f"**Do not share it with anyone, otherwise there will be consequences 😉**",
+            ephemeral=True,
+        )

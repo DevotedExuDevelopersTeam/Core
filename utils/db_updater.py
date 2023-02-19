@@ -3,7 +3,7 @@ from asyncpg.transaction import Transaction
 from exencolorlogs import Logger
 from utils.enums import FetchMode
 
-VERSION = 1
+VERSION = 2
 
 
 async def update_db(db):
@@ -24,6 +24,10 @@ async def update_db(db):
                     case 1:
                         await _con.execute(
                             "ALTER TABLE scores ADD COLUMN score_daily INT DEFAULT 0"
+                        )
+                    case 2:
+                        await _con.execute(
+                            "ALTER TABLE scores ADD COLUMN score_weekly INT DEFAULT 0"
                         )
 
                 # noinspection SqlWithoutWhere

@@ -188,9 +188,14 @@ FROM warns WHERE target_id = $1",
             or 0
         )
 
+    # noinspection SqlWithoutWhere
     async def reset_daily_score(self):
-        # noinspection SqlWithoutWhere
+        await self.execute("DELETE FROM promocodes WHERE expires_at < CURRENT_DATE")
+        if datetime.now().weekday() == 0:
+            await self.execute("UPDATE scores SET score_daily = 0, score_weekly = 0")
+            return
         await self.execute("UPDATE scores SET score_daily = 0")
+        await self.execute("TRUNCATE promo_notifications")
 
     async def get_total_daily_score(self) -> int:
         return await self.execute(
@@ -206,7 +211,7 @@ FROM warns WHERE target_id = $1",
         )
         if not admin and delta > 0:
             await self.execute(
-                "UPDATE scores SET score_daily = score_daily + $1 WHERE id = $2",
+                "UPDATE scores SET score_daily = score_daily + $1, score_weekly = score_weekly + $1 WHERE id = $2",
                 delta,
                 user_id,
             )

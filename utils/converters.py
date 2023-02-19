@@ -3,10 +3,13 @@ from datetime import timedelta
 from re import search
 
 import disnake
+import pendulum
 from disnake.ext.commands import Converter, converter_method
 
 from utils.autocomplete import get_rules
-from utils.errors import RuleNotFound, TimeConversionFailure
+from utils.errors import DateConversionFailure, RuleNotFound, TimeConversionFailure
+
+utc = pendulum.timezone("UTC")
 
 
 class TimeConverter(Converter, timedelta):
@@ -50,3 +53,19 @@ class RuleConverter(Converter, Rule):
             raise RuleNotFound(argument)
 
         return Rule(argument, rules[argument])
+
+
+class DateConverter(Converter, pendulum.Date):
+    @converter_method
+    async def convert(
+        self, inter: disnake.ApplicationCommandInteraction, argument: str
+    ) -> pendulum.Date:
+        try:
+            d = utc.convert(pendulum.parse(argument, strict=False))
+            if isinstance(d, pendulum.DateTime):
+                return pendulum.Date.fromtimestamp(d.timestamp())
+            if isinstance(d, pendulum.Date):
+                return d
+        except Exception:
+            raise DateConversionFailure(argument)
+        raise DateConversionFailure(argument)

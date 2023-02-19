@@ -26,6 +26,11 @@ class TimeConversionFailure(CustomError):
         super().__init__(f"Could not convert `{arg}` to time")
 
 
+class DateConversionFailure(CustomError):
+    def __init__(self, arg: str):
+        super().__init__(f"Could not convert `{arg}` to date")
+
+
 class HierarchyError(CustomError):
     def __init__(self):
         super().__init__(

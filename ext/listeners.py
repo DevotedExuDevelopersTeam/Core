@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import disnake
 
@@ -13,6 +13,7 @@ from utils.constants import (
     WELCOME_CHANNEL_ID,
 )
 from utils.embeds import ErrorEmbed
+from utils.enums import FetchMode
 from utils.utils import ordinal_num
 
 
@@ -74,6 +75,16 @@ class MessageListeners(Cog):
         ):
             await message.delete()
             await message.channel.send(f"{message.author.mention} numbers only!", delete_after=3)
+
+        elif any(
+            r["code"] in message.clean_content.upper()
+            for r in await self.bot.db.execute("SELECT code FROM promocodes", fetch_mode=FetchMode.ALL)
+        ):
+            await message.delete()
+            await message.author.timeout(duration=timedelta(hours=6), reason="Posted valid promocode")
+            await message.channel.send(
+                f"{message.author.mention} I warned you about consequences didn't I? Don't leak promocodes 🙏"
+            )
 
 
 class MembersListeners(Cog):

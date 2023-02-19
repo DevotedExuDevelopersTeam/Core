@@ -266,6 +266,7 @@ class LevelsManagement(Cog):
         inter: disnake.ApplicationCommandInteraction,
         promocode: str = commands.Param(min_length=8, max_length=8),
         expires_at: DateConverter = commands.Param(),
+        unlocks_at: DateConverter = commands.Param(),
     ):
         promocode = promocode.upper()
         if expires_at.is_past():
@@ -274,13 +275,25 @@ class LevelsManagement(Cog):
         if expires_at.weekday() != 6:
             await inter.send("Promocode must expire on Sunday", ephemeral=True)
             return
+        if unlocks_at > expires_at:
+            await inter.send("The unlock date can't be past expire date", ephemeral=True)
+            return
         try:
             await self.bot.db.execute(
-                "INSERT INTO promocodes (code, expires_at) VALUES ($1, $2)",
+                "INSERT INTO promocodes (code, expires_at, unlocks_at) VALUES ($1, $2, $3)",
                 promocode,
                 expires_at,
+                unlocks_at,
             )
         except asyncpg.UniqueViolationError:
-            await inter.send("This promocode is already added!")
+            await inter.send("This promocode is already added!", ephemeral=True)
             return
-        await inter.send("Successfully added new promocode!")
+        await inter.send("Successfully added new promocode!", ephemeral=True)
+
+    @commands.slash_command(name="removepromo", description="Remove the promocode")
+    @commands.has_permissions(manage_guild=True)
+    async def removepromo(
+        self, inter: disnake.ApplicationCommandInteraction, promocode: str = commands.Param(min_length=8, max_length=8)
+    ):
+        await self.bot.db.execute("DELETE FROM promocodes WHERE code = $1", promocode)
+        await inter.send("Successfully removed this promocode!", ephemeral=True)

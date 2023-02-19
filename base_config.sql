@@ -79,7 +79,8 @@ CREATE TABLE IF NOT EXISTS youtubers
 CREATE TABLE IF NOT EXISTS promocodes
 (
     code       VARCHAR(8) PRIMARY KEY,
-    expires_at DATE NOT NULL
+    expires_at DATE NOT NULL,
+    unlocks_at DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS promo_notifications
@@ -96,5 +97,5 @@ CREATE TABLE IF NOT EXISTS version
 );
 
 INSERT INTO version (id, version)
-VALUES (0, 2)
+VALUES (0, 3)
 ON CONFLICT DO NOTHING;

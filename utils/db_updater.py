@@ -4,7 +4,7 @@ from exencolorlogs import Logger
 
 from utils.enums import FetchMode
 
-VERSION = 2
+VERSION = 3
 
 
 async def update_db(db):
@@ -24,6 +24,11 @@ async def update_db(db):
                         await _con.execute("ALTER TABLE scores ADD COLUMN score_daily INT DEFAULT 0")
                     case 2:
                         await _con.execute("ALTER TABLE scores ADD COLUMN score_weekly INT DEFAULT 0")
+                    case 3:
+                        await _con.execute(
+                            "ALTER TABLE promocodes ADD COLUMN unlocks_at DATE NOT NULL DEFAULT CURRENT_DATE"
+                        )
+                        await _con.execute("ALTER TABLE promocodes ALTER COLUMN unlocks_at DROP DEFAULT")
 
                 # noinspection SqlWithoutWhere
                 await _con.execute("UPDATE version SET version = $1", db_version)

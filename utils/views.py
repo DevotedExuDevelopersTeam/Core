@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import TYPE_CHECKING, Awaitable, Callable, Generic, TypeVar
 
 import disnake
@@ -228,6 +229,17 @@ class PromocodeView(disnake.ui.View):
         style=disnake.ButtonStyle.blurple,
     )
     async def get_promocode(self, _, inter: disnake.MessageInteraction):
+        data = await self.bot.db.execute(
+            "SELECT code, unlocks_at, MIN(expires_at) FROM promocodes WHERE expires_at > CURRENT_DATE GROUP BY code",
+            fetch_mode=FetchMode.ROW,
+        )
+        if data is None:
+            await inter.send(
+                "Sorry, there are no available promocodes at the moment. Please wait until admins add more!",
+                ephemeral=True,
+            )
+            return
+
         weekly_score: int = (
             await self.bot.db.execute(
                 "SELECT score_weekly FROM scores WHERE id = $1",
@@ -243,13 +255,14 @@ class PromocodeView(disnake.ui.View):
                 ephemeral=True,
             )
             return
-        promocode = await self.bot.db.execute(
-            "SELECT code, MIN(expires_at) FROM promocodes WHERE expires_at > CURRENT_DATE GROUP BY code",
-            fetch_mode=FetchMode.VAL,
-        )
-        if promocode is None:
+        promocode: str = data["code"]
+        raw_unlocks_at: date = data["unlocks_at"]
+        unlocks_at: datetime = datetime.fromordinal(raw_unlocks_at.toordinal())
+        if datetime.now() < unlocks_at:
             await inter.send(
-                "Sorry, there are no available promocodes at the moment. Please wait until admins add more!",
+                "🎉 Congrats, you already reached required score, but promocode is not available yet 🤯\n"
+                f"Come back to claim your code at {disnake.utils.format_dt(unlocks_at)}\n\n"
+                f"*Sorry, this is made to prevent leakers from annulling your efforts 🥲*",
                 ephemeral=True,
             )
             return

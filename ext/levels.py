@@ -264,9 +264,16 @@ class LevelsManagement(Cog):
     async def addpromo(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        promocode: str,
-        expires_at: DateConverter,
+        promocode: str = commands.Param(min_length=8, max_length=8),
+        expires_at: DateConverter = commands.Param(),
     ):
+        promocode = promocode.upper()
+        if expires_at.is_past():
+            await inter.send("Promocode is already expired", ephemeral=True)
+            return
+        if expires_at.weekday() != 6:
+            await inter.send("Promocode must expire on Sunday", ephemeral=True)
+            return
         try:
             await self.bot.db.execute(
                 "INSERT INTO promocodes (code, expires_at) VALUES ($1, $2)",

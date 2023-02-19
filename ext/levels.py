@@ -135,7 +135,7 @@ class Levels(Cog):
         current_score = await self.bot.db.get_users_score(user.id)
         score_daily, score_weekly = await self.bot.db.execute(
             "SELECT score_daily, score_weekly FROM scores WHERE id = $1",
-            inter.user.id,
+            user.id,
             fetch_mode=FetchMode.ROW,
         )
         next_score = get_next_score(current_score, levels.keys())

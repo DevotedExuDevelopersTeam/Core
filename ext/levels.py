@@ -91,11 +91,11 @@ class Levels(Cog):
                     f"Earn **{PROMOCODE_REQUIRED_SCORE - weekly_score:,}** more till the end of the week "
                     "to receive the promocode!"
                 )
-        if weekly_score > PROMOCODE_REQUIRED_SCORE:
-            await channel.send(
-                f"🥳 Congratulations, {member.mention}, you earned **{PROMOCODE_REQUIRED_SCORE:,}** weekly score "
-                f"which means you can now **claim a promocode** in <#{PROMOCODE_CHANNEL_ID}>!"
-            )
+            else:
+                await channel.send(
+                    f"🥳 Congratulations, {member.mention}, you earned **{PROMOCODE_REQUIRED_SCORE:,}** weekly score "
+                    f"which means you can now **claim a promocode** in <#{PROMOCODE_CHANNEL_ID}>!"
+                )
 
     def _is_last_member(self, msg: disnake.Message) -> bool:
         is_last = self.last_messages.get(msg.channel.id, None) == msg.author.id

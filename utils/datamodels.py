@@ -191,9 +191,9 @@ FROM warns WHERE target_id = $1",
         await self.execute("DELETE FROM promocodes WHERE expires_at < CURRENT_DATE")
         if datetime.now().weekday() == 0:
             await self.execute("UPDATE scores SET score_daily = 0, score_weekly = 0")
+            await self.execute("TRUNCATE promo_notifications")
             return
         await self.execute("UPDATE scores SET score_daily = 0")
-        await self.execute("TRUNCATE promo_notifications")
 
     async def get_total_daily_score(self) -> int:
         return await self.execute("SELECT SUM(score_daily) FROM scores", fetch_mode=FetchMode.VAL)

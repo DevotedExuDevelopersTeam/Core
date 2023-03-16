@@ -5,7 +5,7 @@ from disnake.ext import commands, tasks
 
 from utils.bot import Bot
 from utils.cog import Cog
-from utils.constants import ADMIN_ROLE_ID, ADMINISTRATION_CHANNEL_ID, DAILY_SCORE_TRACKER_ID, MEMBERS_TRACKER_ID
+from utils.constants import ADMINISTRATION_CHANNEL_ID, DAILY_SCORE_TRACKER_ID, MEMBERS_TRACKER_ID
 from utils.enums import FetchMode
 from utils.errors import UNKNOWN, get_error_msg
 
@@ -97,7 +97,7 @@ class SystemLoops(Cog):
         if await self.bot.db.execute("SELECT COUNT(*) FROM promocodes", fetch_mode=FetchMode.VAL) == 0:
             try:
                 await self.bot.get_channel(ADMINISTRATION_CHANNEL_ID).send(
-                    f"<@&{ADMIN_ROLE_ID}> there are no promocodes left, please add more"
+                    "There are no promocodes left, please add more"
                 )
             except Exception as e:
                 self.bot.log.error("Failed to notify admins on promocodes run out", exc_info=e)

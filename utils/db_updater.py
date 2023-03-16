@@ -1,5 +1,4 @@
 import asyncpg
-from asyncpg.transaction import Transaction
 from exencolorlogs import Logger
 
 from utils.enums import FetchMode
@@ -18,7 +17,6 @@ async def update_db(db):
             db_version += 1
             log.info("Executing compatibility script #%s", db_version)
             async with _con.transaction():
-                transaction: Transaction
                 match db_version:  # noqa: E999
                     case 1:
                         await _con.execute("ALTER TABLE scores ADD COLUMN score_daily INT DEFAULT 0")

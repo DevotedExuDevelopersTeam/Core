@@ -5,7 +5,12 @@ from disnake.ext import commands, tasks
 
 from utils.bot import Bot
 from utils.cog import Cog
-from utils.constants import ADMINISTRATION_CHANNEL_ID, DAILY_SCORE_TRACKER_ID, MEMBERS_TRACKER_ID
+from utils.constants import (
+    ADMINISTRATION_CHANNEL_ID,
+    DAILY_SCORE_TRACKER_ID,
+    MEMBERS_TRACKER_ID,
+    NO_PROMOCODES_NOTIFICATION_ENABLED,
+)
 from utils.enums import FetchMode
 from utils.errors import UNKNOWN, get_error_msg
 
@@ -94,7 +99,10 @@ class SystemLoops(Cog):
     async def daily_reset(self):
         await self.bot.wait_until_ready()
         await self.bot.db.reset_daily_score()
-        if await self.bot.db.execute("SELECT COUNT(*) FROM promocodes", fetch_mode=FetchMode.VAL) == 0:
+        if (
+            NO_PROMOCODES_NOTIFICATION_ENABLED
+            and await self.bot.db.execute("SELECT COUNT(*) FROM promocodes", fetch_mode=FetchMode.VAL) == 0
+        ):
             try:
                 await self.bot.get_channel(ADMINISTRATION_CHANNEL_ID).send(
                     "There are no promocodes left, please add more"

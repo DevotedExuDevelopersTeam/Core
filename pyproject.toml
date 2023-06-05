@@ -15,8 +15,8 @@ disnake = "^2.8.1"
 pendulum = "^2.1.2"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.0.263"
-pre-commit = "^3.2.2"
+ruff = "^0.0.270"
+pre-commit = "^3.3.2"
 black = "^23.3.0"
 isort = "^5.12.0"
 

@@ -51,6 +51,7 @@ class Database:
 
         self._connection_config.update(connection_config)
         self._cache = Cache()
+        self._promocodes_present: bool | None = None
 
     async def connect(self):
         self.log.info("Creating connection pool...")
@@ -189,6 +190,7 @@ FROM warns WHERE target_id = $1",
     # noinspection SqlWithoutWhere
     async def reset_daily_score(self):
         await self.execute("DELETE FROM promocodes WHERE expires_at < CURRENT_DATE")
+        self.invalidate_promocodes()
         if datetime.now().weekday() == 0:
             await self.execute("UPDATE scores SET score_daily = 0, score_weekly = 0")
             await self.execute("TRUNCATE promo_notifications")
@@ -324,6 +326,16 @@ FROM warns WHERE target_id = $1",
 
     async def remove_bans(self, id: int):
         await self.execute("DELETE FROM bans WHERE id = $1", id)
+
+    async def promocodes_present(self) -> bool:
+        if self._promocodes_present is None:
+            self._promocodes_present = await self.execute(
+                "SELECT EXISTS(SELECT * FROM promocodes)", fetch_mode=FetchMode.VAL
+            )
+        return self._promocodes_present
+
+    def invalidate_promocodes(self):
+        self._promocodes_present = None
 
 
 class Cache:

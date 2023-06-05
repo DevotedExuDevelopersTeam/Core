@@ -124,7 +124,8 @@ class Levels(Cog):
         self.cooldowns[message.author.id] = datetime.now() + timedelta(seconds=XP_COOLDOWN_SECONDS)
         await self.bot.db.update_users_score(message.author.id, random.randint(*XP_BOUNDS))
         await self._check_level_roles(message.author, message.channel)
-        await self._check_promocodes(message.author, message.channel)
+        if await self.bot.db.promocodes_present():
+            await self._check_promocodes(message.author, message.channel)
 
     @commands.slash_command(name="rank", description="Shows activity info")
     @commands.cooldown(1, 15, commands.BucketType.user)
@@ -285,6 +286,7 @@ class LevelsManagement(Cog):
                 expires_at,
                 unlocks_at,
             )
+            self.bot.db.invalidate_promocodes()
         except asyncpg.UniqueViolationError:
             await inter.send("This promocode is already added!", ephemeral=True)
             return
@@ -296,4 +298,5 @@ class LevelsManagement(Cog):
         self, inter: disnake.ApplicationCommandInteraction, promocode: str = commands.Param(min_length=8, max_length=8)
     ):
         await self.bot.db.execute("DELETE FROM promocodes WHERE code = $1", promocode)
+        self.bot.db.invalidate_promocodes()
         await inter.send("Successfully removed this promocode!", ephemeral=True)
